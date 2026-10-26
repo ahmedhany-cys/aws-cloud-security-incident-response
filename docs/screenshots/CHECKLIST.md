@@ -20,8 +20,21 @@ is committed. Raw, unredacted captures go in `docs/screenshots/raw/`
 | 10 | `10-s3-block-public-access.png` | S3 → `aws-sec-ir-incident-reports-<suffix>` → Permissions → Block public access | All four options **On** |
 | 11 | `11-billing-free-tier.png` | Billing and Cost Management → Free Tier (https://us-east-1.console.aws.amazon.com/billing/home#/freetier) | Free Tier usage table (or the credit balance on the credit-based plan) showing near-zero usage |
 
+## Status (2026-10-26)
+
+All 11 captured by Claude in the built-in browser while the owner was signed in
+to the console as their IAM user (not root).
+
+- **#2 to #8, #10, #11:** real console pages.
+- **#1 and #9:** terminal output (`terraform apply` and `aws s3 cp` of an incident), rendered to PNG with macOS Quick Look from the real captured output.
+- **#3:** shows the T1 test event, because event history had not yet indexed the T3 event at capture time.
+- **#5:** the long `eventName` line runs off the right edge of the console's code box. The full pattern is in `../evidence/06-rule-*.json`.
+
 ## Redaction
 
-Automatic: Claude blurs account IDs with an image mask when it captures via the
-browser tool. Manual fallback: open the PNG in Preview → Markup → draw a filled
-rectangle over the ID, export, and keep the original in `raw/`.
+Redaction was applied before capture. A script replaced every 12-digit
+account ID, email address, IPv4 address, access key ID and IAM unique ID in the
+page text, so no unredacted image was ever saved. Each capture was checked to
+contain zero remaining 12-digit numbers. Manual fallback for future captures:
+open the PNG in Preview, use Markup to draw a filled rectangle over the ID,
+export it, and keep the original in `raw/`.
