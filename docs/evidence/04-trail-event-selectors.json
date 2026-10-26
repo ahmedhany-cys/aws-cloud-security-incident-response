@@ -1,5 +1,5 @@
 # $ aws cloudtrail get-event-selectors --trail-name aws-sec-ir-trail
-# 2026-10-26T06:18:26Z
+# 2026-10-26T07:09:26Z
 {
     "TrailARN": "arn:aws:cloudtrail:us-east-1:123456789012:trail/aws-sec-ir-trail",
     "EventSelectors": [

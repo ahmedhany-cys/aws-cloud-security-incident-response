@@ -1,0 +1,2 @@
+# $ aws logs filter-log-events --log-group-name /aws/lambda/aws-sec-ir-trail-health-check --start-time 1234567890120 --filter-pattern "incident_written" --query events[].message --output text
+# 2026-10-26T07:06:51Z

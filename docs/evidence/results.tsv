@@ -8,3 +8,5 @@ T4	run2	PutBucketPolicy	PASS	incidents/2026/10/26/736436a3-11ad-4b1c-9aa5-7137d4
 T5	run1	DeletePublicAccessBlock	FAIL	wrong event name in rule; fixed (evidence in run1/T5-attempt1-diagnosis.txt)
 T5	run2	DeleteBucketPublicAccessBlock	PASS	incidents/2026/10/26/7e65c18c-8105-4eae-8f94-bddc42c6a81f.json
 T6	run2	ListUsers/ListBuckets	PASS	no incident within 300s
+T7	run4	TrailNotLogging	FAIL (script bug)	health check worked, but the scheduled-run count broke on paginated CLI output (evidence in run4-T7-scriptbug/)
+T7	run5	TrailNotLogging	PASS	incidents/2026/10/26/trail-health-aws-sec-ir-trail-TrailNotLogging-1792998403.json; scheduled run observed

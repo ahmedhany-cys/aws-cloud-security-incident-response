@@ -1,5 +1,5 @@
 # $ aws events list-targets-by-rule --rule aws-sec-ir-logging-tamper
-# 2026-10-26T06:18:33Z
+# 2026-10-26T07:09:34Z
 {
     "Targets": [
         {

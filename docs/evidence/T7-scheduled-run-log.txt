@@ -1,0 +1,4 @@
+# $ aws logs filter-log-events --log-group-name /aws/lambda/aws-sec-ir-trail-health-check --start-time 1234567890120 --filter-pattern "trail_healthy" --query events[].message --output text
+# 2026-10-26T07:07:57Z
+{"level": "INFO", "logger": "incident_processor", "message": "trail_healthy", "request_id": "ef6adefc-399c-425c-9d6c-d82881357f85", "trail": "arn:aws:cloudtrail:us-east-1:123456789012:trail/aws-sec-ir-trail"}
+

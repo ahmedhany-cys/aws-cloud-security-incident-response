@@ -1,5 +1,5 @@
 # $ aws events list-rules --name-prefix aws-sec-ir-
-# 2026-10-26T06:18:27Z
+# 2026-10-26T07:09:27Z
 {
     "Rules": [
         {

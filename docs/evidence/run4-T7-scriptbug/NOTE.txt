@@ -1,0 +1,4 @@
+# T7 first run (2026-10-26 07:01Z): the health check worked (CRITICAL incident, healthy after restore,
+# 2 scheduled runs logged), but the script counted scheduled runs with `--query length(events)`, which the
+# AWS CLI prints once per page ("2" and "0" on two lines), so the integer test failed and T7 was recorded FAIL.
+# Fixed by counting event IDs with wc -w, then T7 was rerun.

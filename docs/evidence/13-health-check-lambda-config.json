@@ -1,0 +1,48 @@
+# $ aws lambda get-function-configuration --function-name aws-sec-ir-trail-health-check
+# 2026-10-26T07:10:01Z
+{
+    "FunctionName": "aws-sec-ir-trail-health-check",
+    "FunctionArn": "arn:aws:lambda:us-east-1:123456789012:function:aws-sec-ir-trail-health-check",
+    "Runtime": "python3.12",
+    "Role": "arn:aws:iam::123456789012:role/aws-sec-ir-trail-health-check-role",
+    "Handler": "incident_processor.health_check_handler",
+    "CodeSize": 5650,
+    "Description": "Scheduled check: CRITICAL incident if the project trail is not logging",
+    "Timeout": 30,
+    "MemorySize": 128,
+    "LastModified": "2026-10-26T06:57:27.664+0000",
+    "CodeSha256": "3XR3eYrNsZB+opzID++qMoIqBhacxvYJGt/nJU4uwFk=",
+    "Version": "$LATEST",
+    "Environment": {
+        "Variables": {
+            "SNS_TOPIC_ARN": "",
+            "TRAIL_ARN": "arn:aws:cloudtrail:us-east-1:123456789012:trail/aws-sec-ir-trail",
+            "INCIDENT_BUCKET": "aws-sec-ir-incident-reports-ahr4827",
+            "LOG_LEVEL": "INFO"
+        }
+    },
+    "TracingConfig": {
+        "Mode": "PassThrough"
+    },
+    "RevisionId": "ffd7f137-fa7f-449e-8da7-195a6b3de68b",
+    "State": "Active",
+    "LastUpdateStatus": "Successful",
+    "PackageType": "Zip",
+    "Architectures": [
+        "arm64"
+    ],
+    "EphemeralStorage": {
+        "Size": 512
+    },
+    "SnapStart": {
+        "ApplyOn": "None",
+        "OptimizationStatus": "Off"
+    },
+    "RuntimeVersionConfig": {
+        "RuntimeVersionArn": "arn:aws:lambda:us-east-1::runtime:0fec05b8b43b0ecfbabe4fd585b35e423f123456789012f8a10b0e8739c36c07"
+    },
+    "LoggingConfig": {
+        "LogFormat": "Text",
+        "LogGroup": "/aws/lambda/aws-sec-ir-trail-health-check"
+    }
+}

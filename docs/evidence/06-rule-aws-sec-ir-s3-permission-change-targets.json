@@ -1,5 +1,5 @@
 # $ aws events list-targets-by-rule --rule aws-sec-ir-s3-permission-change
-# 2026-10-26T06:18:35Z
+# 2026-10-26T07:09:37Z
 {
     "Targets": [
         {

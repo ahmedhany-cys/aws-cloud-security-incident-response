@@ -1,0 +1,25 @@
+# $ aws scheduler get-schedule --group-name aws-sec-ir --name aws-sec-ir-trail-health-check
+# 2026-10-26T07:10:03Z
+{
+    "ActionAfterCompletion": "NONE",
+    "Arn": "arn:aws:scheduler:us-east-1:123456789012:schedule/aws-sec-ir/aws-sec-ir-trail-health-check",
+    "CreationDate": "2026-10-26T10:57:37.149000+04:00",
+    "Description": "Invoke the trail health check Lambda",
+    "FlexibleTimeWindow": {
+        "Mode": "OFF"
+    },
+    "GroupName": "aws-sec-ir",
+    "LastModificationDate": "2026-10-26T10:57:37.149000+04:00",
+    "Name": "aws-sec-ir-trail-health-check",
+    "ScheduleExpression": "rate(5 minutes)",
+    "ScheduleExpressionTimezone": "UTC",
+    "State": "ENABLED",
+    "Target": {
+        "Arn": "arn:aws:lambda:us-east-1:123456789012:function:aws-sec-ir-trail-health-check",
+        "RetryPolicy": {
+            "MaximumEventAgeInSeconds": 300,
+            "MaximumRetryAttempts": 2
+        },
+        "RoleArn": "arn:aws:iam::123456789012:role/aws-sec-ir-scheduler-role"
+    }
+}

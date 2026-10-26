@@ -1,0 +1,43 @@
+# $ aws s3 cp s3://aws-sec-ir-incident-reports-ahr4827/incidents/2026/10/26/trail-health-aws-sec-ir-trail-TrailNotLogging-1792997878.json -
+# 2026-10-26T06:58:08Z
+{
+  "actor": {
+    "arn": null,
+    "type": null,
+    "user_name": null
+  },
+  "aws_region": "us-east-1",
+  "category": "logging_tamper",
+  "detected_at": "2026-10-26T06:58:05Z",
+  "detection_source": "scheduled_health_check",
+  "error_code": null,
+  "error_message": null,
+  "event_name": "TrailNotLogging",
+  "event_source": "aws-sec-ir.trail-health-check",
+  "event_time": "2026-10-26T06:57:58Z",
+  "incident_id": "inc-trail-health-aws-sec-ir-trail-TrailNotLogging-1792997878",
+  "raw_event_id": "trail-health-aws-sec-ir-trail-TrailNotLogging-1792997878",
+  "recommended_actions": [
+    "Find who stopped or deleted the trail: aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=StopLogging (also try DeleteTrail). CloudTrail Event history keeps 90 days even while the trail is off.",
+    "Re-enable logging immediately: aws cloudtrail start-logging --name <trail>.",
+    "Verify trail status with get-trail-status and compare event selectors to the baseline.",
+    "Treat as possible defense evasion: review all API activity by the actor since the event.",
+    "Consider an SCP or IAM deny on cloudtrail:StopLogging / DeleteTrail for non-admins."
+  ],
+  "request_parameters": {
+    "is_logging": false,
+    "latest_delivery_error": null,
+    "start_logging_time": "2026-10-26T06:16:15Z",
+    "stop_logging_time": "2026-10-26T06:57:58Z"
+  },
+  "resources": [
+    {
+      "identifier": "arn:aws:cloudtrail:us-east-1:123456789012:trail/aws-sec-ir-trail",
+      "type": "AWS::CloudTrail::Trail"
+    }
+  ],
+  "schema_version": "1.0",
+  "severity": "CRITICAL",
+  "source_ip": null,
+  "user_agent": null
+}

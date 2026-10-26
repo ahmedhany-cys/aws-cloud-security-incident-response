@@ -1,5 +1,5 @@
 # $ aws events list-targets-by-rule --rule aws-sec-ir-iam-policy-change
-# 2026-10-26T06:18:30Z
+# 2026-10-26T07:09:31Z
 {
     "Targets": [
         {

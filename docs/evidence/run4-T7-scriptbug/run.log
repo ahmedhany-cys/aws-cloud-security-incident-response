@@ -1,0 +1,54 @@
+[06:57:56] ===== T7 =====
+[06:57:58] evidence saved: docs/evidence/T7-command.txt
+[06:58:06] evidence saved: docs/evidence/T7-invoke.txt
+[06:58:07] evidence saved: docs/evidence/T7-restore.txt
+[06:58:08] evidence saved: docs/evidence/T7-verify-restored.txt
+[06:58:10] evidence saved: docs/evidence/T7-incident.json
+[06:58:11] evidence saved: docs/evidence/T7-invoke-healthy.txt
+[06:58:13] evidence saved: docs/evidence/T7-lambda-log.txt
+[06:58:15] T7: waiting for a scheduled health check run ... (418s left)
+scripts/run_test_scenarios.sh: line 154: [: 1
+0: integer expression expected
+[06:58:47] T7: waiting for a scheduled health check run ... (386s left)
+scripts/run_test_scenarios.sh: line 154: [: 1
+0: integer expression expected
+[06:59:19] T7: waiting for a scheduled health check run ... (354s left)
+scripts/run_test_scenarios.sh: line 154: [: 1
+0: integer expression expected
+[06:59:51] T7: waiting for a scheduled health check run ... (322s left)
+scripts/run_test_scenarios.sh: line 154: [: 1
+0: integer expression expected
+[07:00:25] T7: waiting for a scheduled health check run ... (288s left)
+scripts/run_test_scenarios.sh: line 154: [: 1
+0: integer expression expected
+[07:00:57] T7: waiting for a scheduled health check run ... (256s left)
+scripts/run_test_scenarios.sh: line 154: [: 1
+0: integer expression expected
+[07:01:29] T7: waiting for a scheduled health check run ... (224s left)
+scripts/run_test_scenarios.sh: line 154: [: 1
+0: integer expression expected
+[07:02:02] T7: waiting for a scheduled health check run ... (191s left)
+scripts/run_test_scenarios.sh: line 154: [: 1
+0: integer expression expected
+[07:02:34] T7: waiting for a scheduled health check run ... (159s left)
+scripts/run_test_scenarios.sh: line 154: [: 2
+0: integer expression expected
+[07:03:06] T7: waiting for a scheduled health check run ... (127s left)
+scripts/run_test_scenarios.sh: line 154: [: 2
+0: integer expression expected
+[07:03:38] T7: waiting for a scheduled health check run ... (95s left)
+scripts/run_test_scenarios.sh: line 154: [: 2
+0: integer expression expected
+[07:04:10] T7: waiting for a scheduled health check run ... (63s left)
+scripts/run_test_scenarios.sh: line 154: [: 2
+0: integer expression expected
+[07:04:42] T7: waiting for a scheduled health check run ... (31s left)
+scripts/run_test_scenarios.sh: line 154: [: 2
+0: integer expression expected
+[07:05:14] T7: waiting for a scheduled health check run ... (-1s left)
+[07:05:47] evidence saved: docs/evidence/T7-scheduled-run-log.txt
+scripts/run_test_scenarios.sh: line 160: [: 2
+0: integer expression expected
+[07:05:47] ===== results =====
+scenario	event	result	detail
+T7	TrailNotLogging	FAIL	incident ok (incidents/2026/10/26/trail-health-aws-sec-ir-trail-TrailNotLogging-1792997878.json) but no scheduled run within 420s

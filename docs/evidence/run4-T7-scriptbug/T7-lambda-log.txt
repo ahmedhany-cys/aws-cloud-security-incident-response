@@ -1,0 +1,4 @@
+# $ aws logs filter-log-events --log-group-name /aws/lambda/aws-sec-ir-trail-health-check --start-time 1234567890120 --filter-pattern "incident_written" --query events[].message --output text
+# 2026-10-26T06:58:11Z
+{"level": "WARNING", "logger": "incident_processor", "message": "incident_written", "request_id": "fe878f05-9435-4b91-b3a8-1cc90f091029", "incident_id": "inc-trail-health-aws-sec-ir-trail-TrailNotLogging-1792997878", "event_name": "TrailNotLogging", "severity": "CRITICAL", "category": "logging_tamper", "detection_source": "scheduled_health_check", "s3_key": "incidents/2026/10/26/trail-health-aws-sec-ir-trail-TrailNotLogging-1792997878.json"}
+

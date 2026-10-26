@@ -1,5 +1,5 @@
 # $ aws events describe-rule --name aws-sec-ir-logging-tamper
-# 2026-10-26T06:18:32Z
+# 2026-10-26T07:09:33Z
 {
     "Name": "aws-sec-ir-logging-tamper",
     "Arn": "arn:aws:events:us-east-1:123456789012:rule/aws-sec-ir-logging-tamper",

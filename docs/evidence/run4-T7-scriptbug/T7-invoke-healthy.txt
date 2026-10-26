@@ -1,0 +1,6 @@
+# $ aws lambda invoke --function-name aws-sec-ir-trail-health-check --cli-binary-format raw-in-base64-out --payload {} /Users/ahmedhany/aws project (1)/docs/evidence/raw/T7-invoke-healthy-response.json
+# 2026-10-26T06:58:10Z
+{
+    "StatusCode": 200,
+    "ExecutedVersion": "$LATEST"
+}

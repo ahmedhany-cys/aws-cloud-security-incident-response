@@ -1,0 +1,44 @@
+aws_cloudwatch_log_group.health[0]: Creating...
+aws_iam_role.health_lambda[0]: Creating...
+aws_scheduler_schedule_group.project[0]: Creating...
+aws_iam_role.scheduler[0]: Creating...
+aws_lambda_function.incident_processor: Modifying... [id=aws-sec-ir-incident-processor]
+aws_cloudwatch_log_group.health[0]: Creation complete after 2s [id=/aws/lambda/aws-sec-ir-trail-health-check]
+aws_iam_role.scheduler[0]: Creation complete after 2s [id=aws-sec-ir-scheduler-role]
+aws_iam_role.health_lambda[0]: Creation complete after 2s [id=aws-sec-ir-trail-health-check-role]
+data.aws_iam_policy_document.health_lambda[0]: Reading...
+data.aws_iam_policy_document.health_lambda[0]: Read complete after 0s [id=3002648608]
+aws_iam_role_policy.health_lambda[0]: Creating...
+aws_scheduler_schedule_group.project[0]: Creation complete after 2s [id=aws-sec-ir]
+aws_iam_role_policy.health_lambda[0]: Creation complete after 1s [id=aws-sec-ir-trail-health-check-role:aws-sec-ir-trail-health-check-policy]
+aws_lambda_function.trail_health_check[0]: Creating...
+aws_lambda_function.incident_processor: Modifications complete after 8s [id=aws-sec-ir-incident-processor]
+aws_lambda_function.trail_health_check[0]: Still creating... [00m10s elapsed]
+aws_lambda_function.trail_health_check[0]: Creation complete after 15s [id=aws-sec-ir-trail-health-check]
+aws_iam_role_policy.scheduler[0]: Creating...
+aws_iam_role_policy.scheduler[0]: Creation complete after 1s [id=aws-sec-ir-scheduler-role:aws-sec-ir-scheduler-invoke-health-check]
+aws_scheduler_schedule.trail_health_check[0]: Creating...
+aws_scheduler_schedule.trail_health_check[0]: Creation complete after 2s [id=aws-sec-ir/aws-sec-ir-trail-health-check]
+
+Apply complete! Resources: 8 added, 1 changed, 0 destroyed.
+
+Outputs:
+
+audit_bucket = "aws-sec-ir-audit-logs-ahr4827"
+detection_rule_names = [
+  "aws-sec-ir-iam-policy-change",
+  "aws-sec-ir-logging-tamper",
+  "aws-sec-ir-s3-permission-change",
+]
+incident_bucket = "aws-sec-ir-incident-reports-ahr4827"
+lambda_function_name = "aws-sec-ir-incident-processor"
+lambda_log_group = "/aws/lambda/aws-sec-ir-incident-processor"
+region = "us-east-1"
+test_bucket = "aws-sec-ir-test-bucket-ahr4827"
+test_policy_arn = "arn:aws:iam::123456789012:policy/aws-sec-ir/aws-sec-ir-test-policy"
+test_user_name = "aws-sec-ir-test-user"
+trail_arn = "arn:aws:cloudtrail:us-east-1:123456789012:trail/aws-sec-ir-trail"
+trail_health_check_function_name = "aws-sec-ir-trail-health-check"
+trail_health_check_log_group = "/aws/lambda/aws-sec-ir-trail-health-check"
+trail_health_check_schedule = "aws-sec-ir/aws-sec-ir-trail-health-check"
+trail_name = "aws-sec-ir-trail"

@@ -1,0 +1,15 @@
+# $ aws cloudtrail get-trail-status --name aws-sec-ir-trail
+# 2026-10-26T06:58:07Z
+{
+    "IsLogging": true,
+    "LatestDeliveryTime": "2026-10-26T10:55:51.299000+04:00",
+    "StartLoggingTime": "2026-10-26T10:58:07.582000+04:00",
+    "StopLoggingTime": "2026-10-26T10:57:58.336000+04:00",
+    "LatestDigestDeliveryTime": "2026-10-26T10:27:47.995000+04:00",
+    "LatestDeliveryAttemptTime": "2026-10-26T06:55:51Z",
+    "LatestNotificationAttemptTime": "",
+    "LatestNotificationAttemptSucceeded": "",
+    "LatestDeliveryAttemptSucceeded": "2026-10-26T06:55:51Z",
+    "TimeLoggingStarted": "2026-10-26T06:58:07Z",
+    "TimeLoggingStopped": "2026-10-26T06:57:58Z"
+}
