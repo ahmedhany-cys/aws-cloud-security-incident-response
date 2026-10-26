@@ -1,0 +1,82 @@
+# Continuous integration. Every job runs without AWS credentials:
+#   python     unit tests for the Lambda on the runtime version (3.12) and newer
+#   lint       Ruff (pyflakes + core pycodestyle errors, see ruff.toml)
+#   terraform  fmt -check, init (providers only, no backend) and validate
+#   shellcheck static analysis of the test and evidence scripts
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python:
+    name: pytest (Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+      - name: Install dev dependencies
+        run: python -m pip install --upgrade pip && python -m pip install -r requirements-dev.txt
+      - name: Run unit tests
+        run: python -m pytest
+
+  lint:
+    name: Ruff
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install Ruff
+        run: python -m pip install ruff
+      - name: Lint
+        run: ruff check --output-format github lambda tests
+
+  terraform:
+    name: Terraform fmt + validate
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform
+    steps:
+      - uses: actions/checkout@v7
+      - uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_wrapper: false
+      - name: Terraform version
+        run: terraform version
+      - name: Format check
+        run: terraform fmt -check -recursive -diff
+      - name: Init (providers only, no backend)
+        run: terraform init -backend=false -input=false
+      - name: Validate
+        run: terraform validate -no-color
+
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install ShellCheck if missing
+        run: command -v shellcheck >/dev/null || (sudo apt-get update && sudo apt-get install -y shellcheck)
+      - name: ShellCheck
+        run: shellcheck --version && shellcheck -x scripts/*.sh
