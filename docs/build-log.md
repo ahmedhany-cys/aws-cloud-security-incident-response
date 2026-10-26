@@ -71,3 +71,9 @@ Running record of what was done, what was verified, and decisions taken.
 - Screenshots #8 and #9 retaken after run 2 (14 incident objects; post-fix incident JSON without the removed field).
 - Docs completed: test-cases (per-attempt table), README results + screenshot grid + lessons learned, design decisions (S3 event names, restore incidents, StopLogging blind spot), evidence index, screenshot checklist status, cost notes (Free plan expiry), my-tasks statuses.
 - `docs/architecture.png` not produced: no Mermaid renderer installed and installing one was not approved. Mermaid source renders on GitHub.
+
+## 2026-10-26 — Phase 6: GitHub
+
+- Hygiene checks on HEAD and full history: no state/tfvars/env/pem tracked (only `terraform.tfvars.example`); every 12-digit hit reviewed and placeholder-only (fake sequential UUIDs in test events/docs, provider checksums in `.terraform.lock.hcl`); no `AKIA` keys; the real account ID and the owner's Gmail address appear in zero commits. `gitleaks` not installed, so skipped.
+- Commit authorship rewritten (before the first push) to the GitHub no-reply address so the owner's email is not published.
+- Created public repo `ahmedhany-cys/aws-cloud-security-incident-response` with `gh repo create --public --source . --push`.

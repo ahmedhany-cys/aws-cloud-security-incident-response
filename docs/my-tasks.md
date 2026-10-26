@@ -223,6 +223,10 @@ terraform -chdir=terraform apply tfplan-destroy
 
 **What to do:** reply with the suffix, lowercase letters and digits only, 4 to 16 characters. Example: `ahr2610`. Claude writes it into `terraform/terraform.tfvars` (gitignored).
 
+## 10. GitHub repo — DONE
+
+Public repo: https://github.com/ahmedhany-cys/aws-cloud-security-incident-response (pushed 2026-10-26 after all hygiene checks passed). Commits use your GitHub no-reply email, not your Gmail address.
+
 ## Extra manual steps discovered during the build
 
 (Claude appends to this list as the build runs.)
