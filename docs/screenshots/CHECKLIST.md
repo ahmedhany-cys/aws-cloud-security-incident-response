@@ -2,8 +2,8 @@
 
 Eleven screenshots are required. Save each as PNG in `docs/screenshots/` with
 the filename below. **Redact the 12-digit account ID** (top-right of the
-console, in ARNs, and in bucket policies) and any email address before the file
-is committed. Raw, unredacted captures go in `docs/screenshots/raw/`
+console, in ARNs, and in bucket policies), any email address, and the console
+sign-in name shown in the top-right account menu before the file is committed. Raw, unredacted captures go in `docs/screenshots/raw/`
 (gitignored).
 
 | # | Filename | Console path / URL | What must be visible |
@@ -28,6 +28,7 @@ to the console as their IAM user (not root).
 - **#2 to #8, #10, #11:** real console pages.
 - **#1 and #9:** terminal output (`terraform apply` and `aws s3 cp` of an incident), rendered to PNG with macOS Quick Look from the real captured output.
 - **#3:** shows the T1 test event, because event history had not yet indexed the T3 event at capture time.
+- **Later the same day:** the account menu in the top-right corner of #2 to #8, #10 and #11 (sign-in name and first name) was painted over with the navbar colour; nothing else in the images changed. #1 and #9 are terminal renderings and never showed it.
 - **#5:** the long `eventName` line runs off the right edge of the console's code box. The full pattern is in `../evidence/06-rule-*.json`.
 
 ## Redaction
