@@ -13,8 +13,7 @@
       "Action": [
         "freetier:GetAccountPlanState",
         "freetier:GetFreeTierUsage",
-        "budgets:ViewBudget",
-        "budgets:DescribeBudgets"
+        "budgets:ViewBudget"
       ],
       "Resource": "*"
     },

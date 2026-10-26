@@ -34,3 +34,8 @@ Running record of what was done, what was verified, and decisions taken.
 - Docs: README, architecture (Mermaid only; no renderer installed), design-decisions, incident-schema, cost-notes (Free Tier model TBD), teardown, test-cases (NOT RUN), screenshots/CHECKLIST.md, evidence/README.
 - Decisions: root module split by file instead of modules (spec says modules optional); test bucket keeps a Terraform-managed deny-TLS policy so T4 can overwrite and restore a real policy; audit/incident buckets `force_destroy=false`; Lambda arm64; trail single-region with global events.
 - Not done (blocked on user): AWS profile, deployer policy attachment, budget, gh login, bucket suffix → no `terraform plan` against AWS yet, no apply, no T1-T6, no screenshots, no push.
+
+## 2026-10-26 — Fix: invalid action in deployer policy
+
+- User reported an error while setting up. The terminal showed none and the `sec-ir` profile did not exist yet, so the likely source was the console policy editor.
+- Checked all 135 actions in `docs/deployer-policy.json` against the AWS service reference JSON (servicereference.us-east-1.amazonaws.com). One was invalid: `budgets:DescribeBudgets` (an API name; the IAM action is `budgets:ViewBudget`, already present). Removed it. Re-check: 0 invalid actions. Policy size 4.9k of the 6,144-character limit.
