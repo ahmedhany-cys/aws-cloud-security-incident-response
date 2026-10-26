@@ -1,2 +1,2 @@
-# $ aws s3api put-bucket-policy --bucket aws-sec-ir-test-bucket-ahr4827 --policy file:///Users/ahmedhany/aws project (1)/docs/evidence/raw/T4-original-policy.json
+# $ aws s3api put-bucket-policy --bucket aws-sec-ir-test-bucket-ahr4827 --policy file://<project-root>/docs/evidence/raw/T4-original-policy.json
 # 2026-10-26T06:01:10Z

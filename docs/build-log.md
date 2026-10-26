@@ -25,7 +25,7 @@ Running record of what was done, what was verified, and decisions taken.
 
 ## 2026-10-23 — Spec received, project folder chosen, Phases 0-2 code written
 
-- Spec: `/Users/ahmedhany/Downloads/CLAUDE.md`, copied into the project root. Project folder chosen by the user via the folder picker: `aws project (1)` in the home directory. Session moved there; venv recreated.
+- Spec: `~/Downloads/CLAUDE.md`, copied into the project root. Project folder chosen by the user via the folder picker: `aws project (1)` in the home directory. Session moved there; venv recreated.
 - Verified every detection event name against the IAM, CloudTrail and S3 API operation lists (docs.aws.amazon.com API references). All 18 names exist as spelled. Attempts to fetch the EventBridge/CloudTrail integration page returned only the title; the design does not depend on it because a trail is created anyway.
 - Phase 0 (preflight, partial): tool versions OK; `aws sts get-caller-identity --profile sec-ir` still fails (profile missing); Free Tier plan check deferred until the profile exists; `docs/deployer-policy.json` drafted.
 - Phase 1 + 2 code: Terraform root module (versions, providers, variables, main, s3, cloudtrail, detection, responder, notifications, test_resources, outputs, tfvars example). `terraform fmt` clean, `terraform init -backend=false` + `validate` → Success.
