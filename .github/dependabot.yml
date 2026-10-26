@@ -9,6 +9,10 @@ updates:
     labels: [dependencies, github-actions]
     commit-message:
       prefix: "chore(ci)"
+    # One PR for all action bumps instead of one per action.
+    groups:
+      actions:
+        patterns: ["*"]
 
   - package-ecosystem: terraform
     directory: /terraform
