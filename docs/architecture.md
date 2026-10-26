@@ -38,7 +38,7 @@ flowchart LR
     L -.->|if enabled| SNS
 ```
 
-> `architecture.png`: no Mermaid renderer (`mmdc`/Node) is installed on the build machine, so only the Mermaid source is provided. GitHub renders it inline. To export a PNG: `npm i -g @mermaid-js/mermaid-cli && mmdc -i docs/architecture.md -o docs/architecture.png`.
+> `architecture.png`: not generated. No Mermaid renderer (`mmdc` / Node.js) is installed on the build machine, and installing one was not approved, so only the Mermaid source is provided. GitHub renders it inline. To export a PNG: `npm i -g @mermaid-js/mermaid-cli && mmdc -i docs/architecture.md -o docs/architecture.png`.
 
 ## Components
 

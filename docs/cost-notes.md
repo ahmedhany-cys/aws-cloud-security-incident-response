@@ -19,7 +19,14 @@ How to check: Console → Billing and Cost Management → **Free Tier** page, or
 aws freetier get-account-plan-state --profile sec-ir
 ```
 
-> Result for this account: _to be filled in during Phase 0 preflight once the `sec-ir` profile exists._
+> **Result for this account (checked 2026-10-26 with `aws freetier get-account-plan-state`):**
+> - Plan type: **FREE** (the credit-based plan), status **ACTIVE**.
+> - Remaining credits: the API reported **USD 100.78**; the console's Free Tier page showed **USD 120.78** the same morning (screenshot 11). The two views can differ while credit activities are still being applied; trust the console's Credits page.
+> - Plan expiration date: **2026-11-30**.
+>
+> What this means: usage of this project is either inside the always-free limits or drawn from credits, so no card charge is expected. **Before 2026-11-30 you must either upgrade the account to a paid plan or tear the project down.** On the free plan, AWS closes the account after the expiry date unless it is upgraded, and resources are then deleted after a grace period. Teardown steps are in [teardown.md](teardown.md).
+>
+> Budgets present: `aws-sec-ir-budget` (USD 1, created for this project) plus two pre-existing budgets in the account.
 
 ## 2. Per-service free-tier status
 

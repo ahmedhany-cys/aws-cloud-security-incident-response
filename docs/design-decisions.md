@@ -19,9 +19,11 @@ They map to the three MITRE ATT&CK tactics that matter most in an AWS account co
 |---|---|---|
 | IAM policy change (HIGH) | Privilege Escalation / Persistence | `Attach*Policy` and `Put*Policy` are the direct ways to grant permissions to a user, role or group. `CreatePolicy`, `CreatePolicyVersion` and `SetDefaultPolicyVersion` cover the sneakier route of editing an existing managed policy so an already-attached policy silently becomes more powerful. |
 | Logging tamper (CRITICAL) | Defense Evasion | `StopLogging`, `DeleteTrail`, `UpdateTrail` and `PutEventSelectors` are the four calls an attacker uses to blind CloudTrail. Rated CRITICAL because losing the audit trail makes every other detection worthless. |
-| S3 permission change (HIGH) | Exfiltration / Collection | `PutBucketPolicy`, `DeleteBucketPolicy`, `PutBucketAcl`, `PutPublicAccessBlock`, `DeletePublicAccessBlock` are the calls that can make a bucket readable by the world. |
+| S3 permission change (HIGH) | Exfiltration / Collection | `PutBucketPolicy`, `DeleteBucketPolicy`, `PutBucketAcl`, and the public access block calls (`PutBucketPublicAccessBlock`, `DeleteBucketPublicAccessBlock` for one bucket; `PutAccountPublicAccessBlock`, `DeleteAccountPublicAccessBlock` for the whole account) are the calls that can make a bucket readable by the world. |
 
-Every event name was checked against the IAM, CloudTrail and S3 API references on 2026-10-23 rather than guessed. Failed attempts (`errorCode = AccessDenied`) are still matched because an *attempt* to stop logging is itself a strong signal; the report records the error code.
+**API name vs CloudTrail event name (a real bug this project hit).** EventBridge matches the CloudTrail `eventName`, not the API operation name. For IAM and CloudTrail they are identical, but S3 renames some: the `PutPublicAccessBlock` / `DeletePublicAccessBlock` API calls are logged as `PutBucketPublicAccessBlock` / `DeleteBucketPublicAccessBlock` at bucket level, and as `PutAccountPublicAccessBlock` / `DeleteAccountPublicAccessBlock` at account level (S3 user guide, "Amazon S3 CloudTrail events"). The original spec listed the API names. The first test run caught it: T5 produced no incident, and `lookup-events` showed zero events named `DeletePublicAccessBlock` but real events named `PutBucketPublicAccessBlock` from the Terraform apply. The rule now lists the CloudTrail names, and a unit test stops the API-only names from coming back. Interview takeaway: always validate detection patterns against real logged events, not against API docs.
+
+Event names were checked against the IAM, CloudTrail and S3 references on 2026-10-23, and the S3 ones re-checked against the S3 CloudTrail event list and live `lookup-events` output on 2026-10-26. The account-level public access block names are included because they are what the spec's names literally map to, but they were not exercised by a test (changing the account-level block would affect every bucket in the account). Failed attempts (`errorCode = AccessDenied`) are still matched because an *attempt* to stop logging is itself a strong signal; the report records the error code.
 
 **Not included and why.** Root sign-in (`ConsoleLogin` from `aws.signin`) would be a natural fourth rule and is listed under future improvements. `CreateAccessKey`, `CreateUser` and `CreateLoginProfile` are also good candidates but would raise noise in a lab where the deployer legitimately creates users.
 
@@ -80,9 +82,27 @@ The test bucket deliberately has a Terraform-managed bucket policy so T4 has som
 - No CloudWatch Logs delivery from CloudTrail, no Insights, no data events: the three CloudTrail features that are billed.
 - SNS is gated behind `enable_email_alerts`, default `false`.
 
-## 11. Known limitations
+## 11. Why restore steps also raise incidents
 
-- Detection latency depends on CloudTrail → EventBridge delivery, typically 1 to 5 minutes, occasionally longer.
+T4 and T5 put the test bucket back the way it was (re-apply the bucket policy, re-enable the public access block). Those restore calls are themselves S3 permission changes, so they correctly produce HIGH incidents too. A real system would suppress or auto-close incidents for approved change windows; this lab keeps them because every permission change should be visible.
+
+## 12. The StopLogging blind spot (observed in testing)
+
+**What happened.** T3 stops the project trail and restarts it one second later. In the first test run the `StopLogging` call produced a CRITICAL incident within 3 seconds. In the second run, with identical commands and timing, EventBridge never delivered the event, so no incident was created, even though CloudTrail Event history recorded the call both times.
+
+**Why.** The EventBridge user guide says that to receive events with a CloudTrail detail-type, "you must enable a CloudTrail trail with logging." T3 turns off the account's only trail, so whether the `StopLogging` call itself still reaches EventBridge is a race against the trail shutting down.
+
+**Why it matters.** This is exactly the attack the CRITICAL rule exists for: an attacker who stops the only trail can also blind the detection of that stop. Detection is best-effort, not guaranteed, in a single-trail account.
+
+**Fixes, and why none is built in.**
+- *Scheduled health check.* An EventBridge Scheduler job every few minutes runs a small Lambda that calls `cloudtrail:GetTrailStatus` and writes a CRITICAL incident if `IsLogging` is false. This would likely stay inside the free tier, but it adds a service the spec does not list, so it needs the owner's approval first.
+- *A second trail, or an organization trail in a separate account.* Then stopping one trail does not blind EventBridge. A second copy of management events is billed, so it is outside the cost guardrails.
+- *Preventive control.* An SCP or IAM deny on `cloudtrail:StopLogging` / `DeleteTrail` for everyone except a break-glass role. This needs AWS Organizations for SCPs.
+
+## 13. Known limitations
+
+- Detection latency depends on CloudTrail → EventBridge delivery. In testing it was 2 to 30 seconds.
+- `StopLogging` on the account's only trail is detected only sometimes (see section 12).
 - Only management events; no S3 object-level or Lambda data events.
 - Single account, single region.
 - No automated remediation (for example, automatically re-enabling logging). The report recommends actions; a human applies them. This was deliberate: automated remediation needs broader IAM permissions, which contradicts the least-privilege goal of the responder.
