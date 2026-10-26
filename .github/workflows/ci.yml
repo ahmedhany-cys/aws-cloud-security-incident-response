@@ -3,6 +3,7 @@
 #   lint       Ruff (pyflakes + core pycodestyle errors, see ruff.toml)
 #   terraform  fmt -check, init (providers only, no backend) and validate
 #   shellcheck static analysis of the test and evidence scripts
+#   docs       every relative link/image in the Markdown files resolves
 name: CI
 
 on:
@@ -49,7 +50,7 @@ jobs:
       - name: Install Ruff
         run: python -m pip install ruff
       - name: Lint
-        run: ruff check --output-format github lambda tests
+        run: ruff check --output-format github lambda tests scripts
 
   terraform:
     name: Terraform fmt + validate
@@ -80,3 +81,11 @@ jobs:
         run: command -v shellcheck >/dev/null || (sudo apt-get update && sudo apt-get install -y shellcheck)
       - name: ShellCheck
         run: shellcheck --version && shellcheck -x scripts/*.sh
+
+  docs:
+    name: Docs links
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check relative links and images in Markdown
+        run: python3 scripts/check_docs_links.py

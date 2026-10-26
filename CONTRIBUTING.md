@@ -15,14 +15,15 @@ Everything below runs without AWS credentials:
 
 ```bash
 .venv/bin/python -m pytest                       # unit tests
-.venv/bin/ruff check lambda tests                # lint
+.venv/bin/ruff check lambda tests scripts        # lint
 terraform -chdir=terraform fmt -check -recursive # formatting
 terraform -chdir=terraform init -backend=false   # providers only, no state
 terraform -chdir=terraform validate
 shellcheck -x scripts/*.sh                       # brew/apt install shellcheck
+.venv/bin/python scripts/check_docs_links.py     # relative links in Markdown
 ```
 
-CI runs the same checks on every push and pull request
+CI runs the same checks on every pull request and every push to `main`
 ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)).
 
 ## Adding a detection rule
