@@ -28,7 +28,12 @@ Full diagram and component descriptions: [docs/architecture.md](docs/architectur
 |---|---|---|---|
 | IAM policy change | `aws.iam` | AttachUserPolicy, AttachRolePolicy, AttachGroupPolicy, PutUserPolicy, PutRolePolicy, PutGroupPolicy, CreatePolicy, CreatePolicyVersion, SetDefaultPolicyVersion | HIGH |
 | Logging tamper | `aws.cloudtrail` | StopLogging, DeleteTrail, UpdateTrail, PutEventSelectors | CRITICAL |
-| S3 permission change | `aws.s3` | PutBucketPolicy, DeleteBucketPolicy, PutBucketAcl, PutPublicAccessBlock, DeletePublicAccessBlock | HIGH |
+| S3 permission change | `aws.s3` | PutBucketPolicy, DeleteBucketPolicy, PutBucketAcl, PutBucketPublicAccessBlock, DeleteBucketPublicAccessBlock, PutAccountPublicAccessBlock, DeleteAccountPublicAccessBlock | HIGH |
+
+The rule patterns use CloudTrail **event** names, which are not always the API
+operation names. S3 records the `PutPublicAccessBlock` API as
+`PutBucketPublicAccessBlock` (bucket level) or `PutAccountPublicAccessBlock`
+(account level). Test T5 caught this; see the design decisions.
 
 Why these and not others: [docs/design-decisions.md](docs/design-decisions.md).
 Report format: [docs/incident-schema.md](docs/incident-schema.md).
@@ -98,18 +103,31 @@ results: [docs/test-cases.md](docs/test-cases.md).
 
 ## Results summary
 
-_Filled in after Phase 3 (testing) and Phase 5 (screenshots)._
+Tested on 2026-10-26. Unit tests: 24 passed.
 
 | ID | Scenario | Expected | Result |
 |---|---|---|---|
-| T1 | IAM policy attach | HIGH `AttachUserPolicy` | pending |
-| T2 | Inline policy put | HIGH `PutUserPolicy` | pending |
-| T3 | Stop logging (restarted immediately) | CRITICAL `StopLogging` | pending |
-| T4 | Test-bucket policy change | HIGH `PutBucketPolicy` | pending |
-| T5 | Test-bucket public access block removed | HIGH `DeletePublicAccessBlock` | pending |
-| T6 | Benign calls | no incident | pending |
+| T1 | IAM policy attach | HIGH `AttachUserPolicy` | PASS |
+| T2 | Inline policy put | HIGH `PutUserPolicy` | PASS |
+| T3 | Stop logging (restarted immediately) | CRITICAL `StopLogging` | **Partial: detected in 2 of 3 attempts** |
+| T4 | Test-bucket policy change | HIGH `PutBucketPolicy` | PASS |
+| T5 | Test-bucket public access block removed | HIGH `DeleteBucketPublicAccessBlock` | PASS after fixing the rule's event names |
+| T6 | Benign calls | no incident | PASS |
 
-Screenshots: [docs/screenshots/](docs/screenshots/CHECKLIST.md).
+Incidents landed in S3 between 2 and 30 seconds after each API call. T3 is
+partial because stopping the account's only trail can stop EventBridge from
+receiving that same event; see
+[design decisions, section 12](docs/design-decisions.md#12-the-stoplogging-blind-spot-observed-in-testing).
+Full results: [docs/test-cases.md](docs/test-cases.md). Redacted evidence:
+[docs/evidence/](docs/evidence/README.md).
+
+| | |
+|---|---|
+| ![terraform apply](docs/screenshots/01-terraform-apply.png) | ![CloudTrail trail logging](docs/screenshots/02-cloudtrail-trail.png) |
+| ![EventBridge rules](docs/screenshots/04-eventbridge-rules.png) | ![Lambda log with a CRITICAL detection](docs/screenshots/07-lambda-log-detection.png) |
+| ![Incident objects in S3](docs/screenshots/08-incident-bucket-objects.png) | ![An incident report](docs/screenshots/09-incident-json.png) |
+
+All eleven screenshots: [docs/screenshots/](docs/screenshots/CHECKLIST.md).
 
 ## Cost
 
@@ -125,10 +143,16 @@ Empty the versioned buckets, then `terraform destroy`, then confirm no
 
 ## Lessons learned
 
-_Filled in at the end of the build._
+- **API names are not always CloudTrail event names.** The spec listed `PutPublicAccessBlock` / `DeletePublicAccessBlock`; S3 logs them as `PutBucketPublicAccessBlock` / `DeleteBucketPublicAccessBlock` (or the `Account` variants). The first test run caught it because T5 produced no incident. Validate every pattern against real logged events.
+- **Test the detection, not just the deployment.** `terraform apply` succeeded and the rule looked right in the console, yet one detection could never fire. Only an end-to-end scenario with an observed incident proves a rule works.
+- **Read your own output critically.** The first incident reports had an always-null `eventbridge_rule` field, based on a wrong assumption about the EventBridge envelope. It was removed rather than kept as misleading data.
+- **Detection is fast; CloudTrail search is slow.** Incidents landed in S3 2 to 30 seconds after the API call, while `lookup-events` took several minutes to index the same events. Poll with a timeout rather than assuming failure.
+- **Evidence leaks more than account IDs.** CloudTrail records carry the caller's access key ID and public IP. The redaction script masks those too before anything is committed.
+- **Restore steps are detections too.** Putting a bucket policy back is itself a permission change, so T4 and T5 raise extra HIGH incidents. That is correct; a production system would tie them to an approved change window.
 
 ## Future improvements
 
+- Scheduled trail health check (EventBridge Scheduler + `GetTrailStatus`) to close the `StopLogging` blind spot found in T3.
 - Root console sign-in detection (`aws.signin` / `ConsoleLogin` with `userIdentity.type = Root`).
 - Access-key and user creation detection (`CreateAccessKey`, `CreateUser`, `CreateLoginProfile`).
 - SNS email (already wired, `enable_email_alerts = true`) or Slack via a webhook Lambda.

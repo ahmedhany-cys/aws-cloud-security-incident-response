@@ -66,9 +66,9 @@ python3 -m pip install --user boto3 pytest
 
 ---
 
-## 2. Create the dedicated IAM user and access key — PARTLY DONE
+## 2. Create the dedicated IAM user and access key — DONE
 
-> **Status 2026-10-26:** Claude created the user `aws-sec-ir-deployer` in the console at your request: console access disabled, `aws-sec-ir-deployer-policy` attached directly, tag `Project = aws-sec-ir`. **Still to do by you:** sub-steps 6 to 8 (create the access key) and the `aws configure --profile sec-ir` part. Claude must never create access keys or handle the secret.
+> **Status 2026-10-26:** Claude created the user `aws-sec-ir-deployer` in the console at your request (console access disabled, policy attached, tag `Project = aws-sec-ir`). You created the access key and the `sec-ir` profile. Verified: `aws sts get-caller-identity --profile sec-ir` returns `user/aws-sec-ir-deployer`.
 
 **Why:** The build must never use your root account. A dedicated user with a single access key can be deleted at the end, which limits the damage if the key ever leaks.
 
@@ -125,7 +125,7 @@ aws sts get-caller-identity --profile sec-ir
 
 ---
 
-## 4. Set a billing budget — BLOCKING (protects you from surprise charges)
+## 4. Set a billing budget — DONE (verified: `aws-sec-ir-budget` exists)
 
 **Why:** Everything in this project is designed for the Free Tier, but a budget is the safety net. Email alerts for the *project itself* are off per your settings; the budget email is different and goes only to you.
 
@@ -141,7 +141,7 @@ aws sts get-caller-identity --profile sec-ir
 
 ---
 
-## 5. Sign in to GitHub from the terminal — IN PROGRESS (Claude started `gh auth login --web` in the "GitHub login" terminal tab; you answer the prompts and approve in the browser)
+## 5. Sign in to GitHub from the terminal — DONE (verified: logged in as `ahmedhany-cys`)
 
 **Why:** Claude creates the public repo `aws-cloud-security-incident-response` and pushes with the `gh` CLI, which needs your GitHub login. The login flow uses a browser code, so you must do it yourself.
 
@@ -180,7 +180,7 @@ gh auth status
 
 ---
 
-## 7. Screenshots to take yourself (fallback only) — LATER
+## 7. Screenshots to take yourself (fallback only) — NOT NEEDED (all 11 captured; see `docs/screenshots/CHECKLIST.md`)
 
 Used only if the browser pane cannot reach the console. Save each as PNG under `docs/screenshots/` with the exact filename, and blur or crop the account ID (top-right) before saving.
 
@@ -196,14 +196,18 @@ The exact list depends on the resources in CLAUDE.md and will be filled in once 
 
 ---
 
-## 8. Clean up when finished — LATER (do not do this yet)
+## 8. Clean up when finished — TO DO (only when you are finished, and before 2026-11-30)
 
 **Why:** Removes every resource so nothing can bill you, then removes the key so it can never be used.
 
-1. Ask Claude to run the teardown (it will show you the destroy plan first and wait for your yes). The command it will run, from the project folder:
+1. Ask Claude to run the teardown. It will empty the two versioned buckets, show you the destroy plan, and wait for your yes. The full sequence is in `docs/teardown.md`; the destroy step itself is:
 
 ```bash
-terraform destroy -var-file=terraform.tfvars
+terraform -chdir=terraform plan -destroy -out=tfplan-destroy
+```
+
+```bash
+terraform -chdir=terraform apply tfplan-destroy
 ```
 
 2. Console → **IAM** → **Users** → **aws-sec-ir-deployer** → **Security credentials** → the access key → **Actions** → **Deactivate**, then **Delete**.
@@ -213,7 +217,7 @@ terraform destroy -var-file=terraform.tfvars
 
 ---
 
-## 9. Tell Claude the bucket suffix — BLOCKING
+## 9. Tell Claude the bucket suffix — DONE (Claude chose `ahr4827`, per your "initials + 4 digits" setting)
 
 **Why:** S3 bucket names are global, so each project bucket gets a unique suffix. Your settings say "initials + 4 digits".
 
@@ -223,6 +227,9 @@ terraform destroy -var-file=terraform.tfvars
 
 (Claude appends to this list as the build runs.)
 
+- 2026-10-26: **Your Free plan ends on 2026-11-30.** Before then, either upgrade the account (Billing, then Upgrade plan) or run the teardown in step 8. On the free plan AWS closes the account after expiry unless you upgrade. **To do.**
+- 2026-10-26: **Decide on the StopLogging blind spot.** Test T3 detected `StopLogging` in only 2 of 3 attempts, because stopping the only trail can stop EventBridge from receiving that event. The fix Claude recommends is a scheduled trail health check (EventBridge Scheduler plus a small Lambda calling `GetTrailStatus`). It is likely free-tier, but it adds a service CLAUDE.md does not list, so Claude needs your yes. **To decide.**
+- 2026-10-26: **Your CLAUDE.md still lists the S3 API names** `PutPublicAccessBlock` / `DeletePublicAccessBlock`. The code now uses the real CloudTrail names. Claude did not edit your rulebook; update its detection table if you want it to match. **Optional.**
 - 2026-10-26: the console policy editor rejected `budgets:DescribeBudgets` (not an IAM action). Removed from `docs/deployer-policy.json`. **Done.**
 - 2026-10-23: no Mermaid renderer (`mmdc`, Node) is installed, so `docs/architecture.png` is not generated; the Mermaid source in `docs/architecture.md` renders on GitHub. Optional: `brew install node && npm i -g @mermaid-js/mermaid-cli`, then tell Claude to export the PNG. **To do (optional).**
 - 2026-10-23: `gitleaks` is not installed; the hygiene checks will use the three `git grep` checks from CLAUDE.md. Optional: `brew install gitleaks`. **To do (optional).**
