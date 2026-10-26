@@ -29,8 +29,12 @@ locals {
   lambda_function_name = "${var.name_prefix}-incident-processor"
   lambda_log_group     = "/aws/lambda/${local.lambda_function_name}"
 
-  # One EventBridge rule per detection category. Every event name below was
-  # checked against the IAM, CloudTrail and S3 API references on 2026-10-23.
+  # One EventBridge rule per detection category. Names are CloudTrail *event*
+  # names, which are not always the API operation names: S3 logs the bucket-level
+  # PutPublicAccessBlock API as PutBucketPublicAccessBlock and the account-level
+  # one as PutAccountPublicAccessBlock (S3 user guide, "Amazon S3 CloudTrail
+  # events"). Verified 2026-10-26 against that page and against live
+  # lookup-events output.
   detection_rules = {
     iam-policy-change = {
       description  = "IAM policy attached, created or inlined (privilege escalation path)"
@@ -54,7 +58,8 @@ locals {
       event_source = "s3.amazonaws.com"
       event_names = [
         "PutBucketPolicy", "DeleteBucketPolicy", "PutBucketAcl",
-        "PutPublicAccessBlock", "DeletePublicAccessBlock",
+        "PutBucketPublicAccessBlock", "DeleteBucketPublicAccessBlock",
+        "PutAccountPublicAccessBlock", "DeleteAccountPublicAccessBlock",
       ]
     }
   }

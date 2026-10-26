@@ -56,7 +56,7 @@ def fake_clients(monkeypatch):
         ("put_user_policy.json", "PutUserPolicy", "HIGH", "iam_policy_change"),
         ("stop_logging.json", "StopLogging", "CRITICAL", "logging_tamper"),
         ("put_bucket_policy.json", "PutBucketPolicy", "HIGH", "s3_permission_change"),
-        ("delete_public_access_block.json", "DeletePublicAccessBlock", "HIGH", "s3_permission_change"),
+        ("delete_public_access_block.json", "DeleteBucketPublicAccessBlock", "HIGH", "s3_permission_change"),
     ],
 )
 def test_report_classification(event_file, expected_name, expected_severity, expected_category):
@@ -75,6 +75,18 @@ def test_every_rule_event_name_is_in_lookup():
     names -= {"AWS"}  # not an event name
     missing = names - set(ip.LOOKUP)
     assert not missing, f"event names in Terraform but not in LOOKUP: {missing}"
+
+
+def test_api_names_that_cloudtrail_never_emits_are_not_used():
+    """Regression for T5 attempt 1: S3 logs PublicAccessBlock calls under
+    different CloudTrail event names than the API operation names."""
+    tf = (Path(__file__).parents[1] / "terraform" / "main.tf").read_text()
+    for api_only in ('"PutPublicAccessBlock"', '"DeletePublicAccessBlock"'):
+        assert api_only not in tf
+        assert api_only.strip('"') not in ip.LOOKUP
+    for ct_name in ("PutBucketPublicAccessBlock", "DeleteBucketPublicAccessBlock",
+                    "PutAccountPublicAccessBlock", "DeleteAccountPublicAccessBlock"):
+        assert ct_name in ip.LOOKUP
 
 
 def test_unknown_event_is_unclassified_but_still_reported():

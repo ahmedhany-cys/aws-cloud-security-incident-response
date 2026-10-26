@@ -6,7 +6,7 @@
   "account": "123456789012",
   "time": "2026-10-23T10:15:30Z",
   "region": "us-east-1",
-  "resources": ["arn:aws:events:us-east-1:123456789012:rule/aws-sec-ir-s3-permission-change"],
+  "resources": [],
   "detail": {
     "eventVersion": "1.09",
     "userIdentity": {
@@ -19,7 +19,7 @@
     },
     "eventTime": "2026-10-23T10:15:28Z",
     "eventSource": "s3.amazonaws.com",
-    "eventName": "DeletePublicAccessBlock",
+    "eventName": "DeleteBucketPublicAccessBlock",
     "awsRegion": "us-east-1",
     "sourceIPAddress": "203.0.113.10",
     "userAgent": "aws-cli/2.36.40 md/awscrt#0.27.0 ua/2.0 os/macos#24.6.0",

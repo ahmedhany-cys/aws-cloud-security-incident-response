@@ -84,7 +84,8 @@ t4() { # S3 bucket policy change on the TEST bucket -> HIGH PutBucketPolicy
   collect_positive T4 PutBucketPolicy "$since"
 }
 
-t5() { # Public access block removal on the TEST bucket -> HIGH DeletePublicAccessBlock
+t5() { # Public access block removal on the TEST bucket -> HIGH DeleteBucketPublicAccessBlock
+  # (API: delete-public-access-block; CloudTrail event name: DeleteBucketPublicAccessBlock)
   local since; since="$(date +%s)"
   save_evidence "T5-command.txt" -- aws s3api delete-public-access-block --bucket "$TEST_BUCKET"
   sleep 2
@@ -92,7 +93,7 @@ t5() { # Public access block removal on the TEST bucket -> HIGH DeletePublicAcce
     --public-access-block-configuration BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true
   save_evidence "T5-verify-restored.txt" -- aws s3api get-public-access-block --bucket "$TEST_BUCKET"
   grep -c true "$EVIDENCE_RAW/T5-verify-restored.txt" | grep -q 4 || die "T5: public access block not fully restored"
-  collect_positive T5 DeletePublicAccessBlock "$since"
+  collect_positive T5 DeleteBucketPublicAccessBlock "$since"
 }
 
 t6() { # Negative test: benign calls must NOT create incidents

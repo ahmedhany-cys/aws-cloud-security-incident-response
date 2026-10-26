@@ -6,7 +6,7 @@
   "account": "123456789012",
   "time": "2026-10-23T10:15:30Z",
   "region": "us-east-1",
-  "resources": ["arn:aws:events:us-east-1:123456789012:rule/aws-sec-ir-iam-policy-change"],
+  "resources": [],
   "detail": {
     "eventVersion": "1.09",
     "userIdentity": {

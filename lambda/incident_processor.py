@@ -66,8 +66,10 @@ LOOKUP: dict[str, dict[str, Any]] = {
     **{
         name: {"category": "s3_permission_change", "severity": "HIGH", "actions": _S3_ACTIONS}
         for name in (
+            # CloudTrail event names (not API names): see terraform/main.tf
             "PutBucketPolicy", "DeleteBucketPolicy", "PutBucketAcl",
-            "PutPublicAccessBlock", "DeletePublicAccessBlock",
+            "PutBucketPublicAccessBlock", "DeleteBucketPublicAccessBlock",
+            "PutAccountPublicAccessBlock", "DeleteAccountPublicAccessBlock",
         )
     },
 }
@@ -252,7 +254,6 @@ def build_report(event: dict[str, Any], detected_at: datetime | None = None) -> 
         "error_message": detail.get("errorMessage"),
         "recommended_actions": list(cls["actions"]),
         "raw_event_id": detail["eventID"],
-        "eventbridge_rule": (event.get("resources") or [None])[0],
     }
 
 

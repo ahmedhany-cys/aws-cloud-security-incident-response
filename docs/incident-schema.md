@@ -28,7 +28,6 @@ duplicate (idempotent writes).
 | `error_message` | string or null | `detail.errorMessage` | |
 | `recommended_actions[]` | list of string | lookup table | Analyst playbook for this category |
 | `raw_event_id` | string | `detail.eventID` | Use with `aws cloudtrail lookup-events` to fetch the full record |
-| `eventbridge_rule` | string | EventBridge `resources[0]` | ARN of the rule that matched |
 
 ## Severity table (lookup in `lambda/incident_processor.py`)
 
@@ -36,7 +35,7 @@ duplicate (idempotent writes).
 |---|---|---|
 | `iam_policy_change` | AttachUserPolicy, AttachRolePolicy, AttachGroupPolicy, PutUserPolicy, PutRolePolicy, PutGroupPolicy, CreatePolicy, CreatePolicyVersion, SetDefaultPolicyVersion | HIGH |
 | `logging_tamper` | StopLogging, DeleteTrail, UpdateTrail, PutEventSelectors | CRITICAL |
-| `s3_permission_change` | PutBucketPolicy, DeleteBucketPolicy, PutBucketAcl, PutPublicAccessBlock, DeletePublicAccessBlock | HIGH |
+| `s3_permission_change` | PutBucketPolicy, DeleteBucketPolicy, PutBucketAcl, PutBucketPublicAccessBlock, DeleteBucketPublicAccessBlock, PutAccountPublicAccessBlock, DeleteAccountPublicAccessBlock | HIGH |
 | `unclassified` | anything else that reaches the Lambda | MEDIUM |
 
 ## Example
@@ -75,7 +74,6 @@ duplicate (idempotent writes).
     "If unauthorised: detach/delete the policy, then rotate the actor's credentials.",
     "Check CloudTrail for other activity by the same principal in the last 24 h."
   ],
-  "raw_event_id": "e1000001-0000-4000-8000-000000000001",
-  "eventbridge_rule": "arn:aws:events:us-east-1:123456789012:rule/aws-sec-ir-iam-policy-change"
+  "raw_event_id": "e1000001-0000-4000-8000-000000000001"
 }
 ```
