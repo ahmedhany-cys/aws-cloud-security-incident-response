@@ -10,6 +10,12 @@ recommended actions come from the LOOKUP table below, not from Terraform.
 
 Logging is structured JSON on stdout (CloudWatch). Exceptions are logged and
 re-raised so failed invocations are visible as errors in CloudWatch metrics.
+
+A second entry point, health_check_handler, is invoked by EventBridge
+Scheduler every few minutes. It calls cloudtrail:GetTrailStatus and writes a
+CRITICAL incident when the trail is not logging (or no longer exists). This
+closes the blind spot found in test T3: stopping the only trail can stop
+EventBridge from receiving that same StopLogging event.
 """
 
 from __future__ import annotations
@@ -254,6 +260,7 @@ def build_report(event: dict[str, Any], detected_at: datetime | None = None) -> 
         "error_message": detail.get("errorMessage"),
         "recommended_actions": list(cls["actions"]),
         "raw_event_id": detail["eventID"],
+        "detection_source": "eventbridge",
     }
 
 
@@ -321,4 +328,145 @@ def handler(event: dict[str, Any], context: Any = None) -> dict[str, Any]:
             raw_event_id=((event or {}).get("detail") or {}).get("eventID"),
         )
         LOG.exception("unhandled error in incident_processor")
+        raise
+
+
+# ---------------------------------------------------------------------------
+# Scheduled trail health check (EventBridge Scheduler -> this handler)
+# ---------------------------------------------------------------------------
+
+_HEALTH_EXTRA_ACTIONS = [
+    "Find who stopped or deleted the trail: aws cloudtrail lookup-events "
+    "--lookup-attributes AttributeKey=EventName,AttributeValue=StopLogging "
+    "(also try DeleteTrail). CloudTrail Event history keeps 90 days even while the trail is off.",
+]
+
+
+def _iso(ts: Any) -> str | None:
+    if ts is None:
+        return None
+    if isinstance(ts, datetime):
+        if ts.tzinfo is None:
+            ts = ts.replace(tzinfo=timezone.utc)
+        return ts.astimezone(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    return str(ts)
+
+
+def _error_code(exc: Exception) -> str | None:
+    """botocore ClientError carries the AWS error code in exc.response."""
+    response = getattr(exc, "response", None) or {}
+    return (response.get("Error") or {}).get("Code")
+
+
+def build_health_report(
+    trail_arn: str,
+    problem: str,
+    status: dict[str, Any] | None,
+    detected_at: datetime | None = None,
+) -> dict[str, Any]:
+    """problem is 'TrailNotLogging' or 'TrailMissing' (synthetic event names)."""
+    detected_at = detected_at or datetime.now(timezone.utc)
+    status = status or {}
+    trail_name = trail_arn.rsplit("/", 1)[-1]
+    stop_time = status.get("StopLoggingTime")
+
+    # Idempotency: one incident per stop. Repeated checks while the trail stays
+    # off overwrite the same object. A missing trail has no stop time, so it is
+    # keyed per UTC hour instead.
+    if stop_time is not None:
+        anchor = _iso(stop_time)
+        suffix = str(int((stop_time if isinstance(stop_time, datetime) else detected_at).timestamp()))
+    else:
+        anchor = _iso(detected_at)
+        suffix = detected_at.strftime("%Y%m%dT%H")
+    incident_ref = f"trail-health-{trail_name}-{problem}-{suffix}"
+
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "incident_id": f"inc-{incident_ref}",
+        "detected_at": _iso(detected_at),
+        "event_time": anchor,
+        "severity": "CRITICAL",
+        "category": "logging_tamper",
+        "event_name": problem,
+        "event_source": "aws-sec-ir.trail-health-check",
+        "aws_region": os.environ.get("AWS_REGION"),
+        # GetTrailStatus does not say who stopped the trail; see recommended actions.
+        "actor": {"type": None, "arn": None, "user_name": None},
+        "source_ip": None,
+        "user_agent": None,
+        "resources": [{"type": "AWS::CloudTrail::Trail", "identifier": trail_arn}],
+        "request_parameters": {
+            "is_logging": status.get("IsLogging"),
+            "stop_logging_time": _iso(stop_time),
+            "start_logging_time": _iso(status.get("StartLoggingTime")),
+            "latest_delivery_error": status.get("LatestDeliveryError"),
+        },
+        "error_code": None,
+        "error_message": None,
+        "recommended_actions": _HEALTH_EXTRA_ACTIONS + list(LOOKUP["StopLogging"]["actions"]),
+        "raw_event_id": incident_ref,
+        "detection_source": "scheduled_health_check",
+    }
+
+
+def health_check_handler(event: dict[str, Any] | None = None, context: Any = None) -> dict[str, Any]:
+    bucket = os.environ.get("INCIDENT_BUCKET")
+    trail_arn = os.environ.get("TRAIL_ARN")
+    topic_arn = os.environ.get("SNS_TOPIC_ARN") or ""
+    request_id = getattr(context, "aws_request_id", None)
+
+    try:
+        if not bucket or not trail_arn:
+            raise RuntimeError("INCIDENT_BUCKET and TRAIL_ARN environment variables must be set")
+
+        try:
+            status = get_client("cloudtrail").get_trail_status(Name=trail_arn)
+        except Exception as exc:  # noqa: BLE001 - only TrailNotFound is an incident
+            if _error_code(exc) != "TrailNotFoundException":
+                raise
+            status, problem = None, "TrailMissing"
+        else:
+            if status.get("IsLogging"):
+                _log(logging.INFO, "trail_healthy", request_id=request_id, trail=trail_arn)
+                return {"status": "healthy", "trail": trail_arn}
+            problem = "TrailNotLogging"
+
+        report = build_health_report(trail_arn, problem, status)
+        key = incident_key(report)
+        get_client("s3").put_object(
+            Bucket=bucket,
+            Key=key,
+            Body=json.dumps(report, indent=2, sort_keys=True).encode("utf-8"),
+            ContentType="application/json",
+        )
+        _log(
+            logging.WARNING,
+            "incident_written",
+            request_id=request_id,
+            incident_id=report["incident_id"],
+            event_name=problem,
+            severity=report["severity"],
+            category=report["category"],
+            detection_source="scheduled_health_check",
+            s3_key=key,
+        )
+        if topic_arn:
+            get_client("sns").publish(
+                TopicArn=topic_arn,
+                Subject=f"[CRITICAL] {problem}: {trail_arn.rsplit('/', 1)[-1]}",
+                Message=json.dumps(report, indent=2, sort_keys=True),
+            )
+        return {"status": "incident", "problem": problem, "bucket": bucket, "key": key}
+
+    except Exception as exc:  # noqa: BLE001 - we log and re-raise on purpose
+        _log(
+            logging.ERROR,
+            "health_check_failed",
+            request_id=request_id,
+            error_type=type(exc).__name__,
+            error=str(exc),
+            trail=trail_arn,
+        )
+        LOG.exception("unhandled error in health_check_handler")
         raise

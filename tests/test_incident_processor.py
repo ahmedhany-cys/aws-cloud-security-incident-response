@@ -110,6 +110,7 @@ def test_report_has_all_schema_fields():
     assert set(report["actor"]) == {"type", "arn", "user_name"}
     assert report["incident_id"] == "inc-e1000001-0000-4000-8000-000000000001"
     assert report["raw_event_id"] == "e1000001-0000-4000-8000-000000000001"
+    assert report["detection_source"] == "eventbridge"
 
 
 def test_detected_at_is_utc_iso():

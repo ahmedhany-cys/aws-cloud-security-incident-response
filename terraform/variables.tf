@@ -72,3 +72,15 @@ variable "s3_noncurrent_expiration_days" {
   type        = number
   default     = 7
 }
+
+variable "enable_trail_health_check" {
+  description = "Create the scheduled trail health check (EventBridge Scheduler + Lambda calling GetTrailStatus)."
+  type        = bool
+  default     = true
+}
+
+variable "trail_health_check_schedule" {
+  description = "Schedule expression for the trail health check."
+  type        = string
+  default     = "rate(5 minutes)"
+}

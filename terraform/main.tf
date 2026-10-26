@@ -7,6 +7,7 @@
 #   responder.tf       Lambda function, execution role, log group
 #   notifications.tf   optional SNS topic (enable_email_alerts)
 #   test_resources.tf  throwaway IAM user / policy / bucket used by T1-T5
+#   health_check.tf    scheduled GetTrailStatus check (closes the T3 blind spot)
 
 data "aws_caller_identity" "current" {}
 data "aws_partition" "current" {}

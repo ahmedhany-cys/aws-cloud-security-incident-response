@@ -227,12 +227,38 @@ terraform -chdir=terraform apply tfplan-destroy
 
 Public repo: https://github.com/ahmedhany-cys/aws-cloud-security-incident-response (pushed 2026-10-26 after all hygiene checks passed). Commits use your GitHub no-reply email, not your Gmail address.
 
+## 11. Add the Scheduler permissions to the deployer policy — BLOCKING for the trail health check
+
+**Why:** the new trail health check uses EventBridge Scheduler. The deployer user has no Scheduler permissions; confirmed on 2026-10-26, `aws scheduler list-schedule-groups` returned `AccessDeniedException` for `scheduler:ListScheduleGroups`. Claude must not grant itself permissions.
+
+**What changed in `docs/deployer-policy.json`:** two new statements at the end.
+- `SchedulerProjectGroupAndSchedule`: create, read, update, delete and tag, only on `schedule-group/aws-sec-ir` and `schedule/aws-sec-ir/*` in us-east-1.
+- `SchedulerList`: `ListSchedules` and `ListScheduleGroups`, which have no resource ARN, so `*`.
+
+**Exact console path:**
+1. Console, then **IAM**, then **Policies**. Search for `aws-sec-ir-deployer-policy` and click it.
+2. Click **Edit**, then the **JSON** tab.
+3. Select all the text in the editor and delete it. Paste the whole of `docs/deployer-policy.json`.
+4. Click **Next**, then **Save changes**.
+
+**You should see:** a banner saying the policy was edited, and "Editor has no errors" before saving.
+
+**Check it worked:**
+
+```bash
+aws scheduler list-schedule-groups --profile sec-ir --region us-east-1
+```
+
+This should print a JSON list instead of `AccessDeniedException`.
+
+**Stop and tell Claude if:** the editor shows an error, or the save fails because the policy already has 5 versions. In that case delete the oldest non-default version under the policy's **Policy versions** tab first.
+
 ## Extra manual steps discovered during the build
 
 (Claude appends to this list as the build runs.)
 
 - 2026-10-26: **Your Free plan ends on 2026-11-30.** Before then, either upgrade the account (Billing, then Upgrade plan) or run the teardown in step 8. On the free plan AWS closes the account after expiry unless you upgrade. **To do.**
-- 2026-10-26: **Decide on the StopLogging blind spot.** Test T3 detected `StopLogging` in only 2 of 3 attempts, because stopping the only trail can stop EventBridge from receiving that event. The fix Claude recommends is a scheduled trail health check (EventBridge Scheduler plus a small Lambda calling `GetTrailStatus`). It is likely free-tier, but it adds a service CLAUDE.md does not list, so Claude needs your yes. **To decide.**
+- 2026-10-26: **Decided: build the trail health check** (you said yes). Built; waiting on step 11 and your plan approval. ~~Decide on the StopLogging blind spot.~~ Test T3 detected `StopLogging` in only 2 of 3 attempts, because stopping the only trail can stop EventBridge from receiving that event. The fix Claude recommends is a scheduled trail health check (EventBridge Scheduler plus a small Lambda calling `GetTrailStatus`). It is likely free-tier, but it adds a service CLAUDE.md does not list, so Claude needs your yes. **To decide.**
 - 2026-10-26: **Your CLAUDE.md still lists the S3 API names** `PutPublicAccessBlock` / `DeletePublicAccessBlock`. The code now uses the real CloudTrail names. Claude did not edit your rulebook; update its detection table if you want it to match. **Optional.**
 - 2026-10-26: the console policy editor rejected `budgets:DescribeBudgets` (not an IAM action). Removed from `docs/deployer-policy.json`. **Done.**
 - 2026-10-23: no Mermaid renderer (`mmdc`, Node) is installed, so `docs/architecture.png` is not generated; the Mermaid source in `docs/architecture.md` renders on GitHub. Optional: `brew install node && npm i -g @mermaid-js/mermaid-cli`, then tell Claude to export the PNG. **To do (optional).**

@@ -37,7 +37,9 @@ aws freetier get-account-plan-state --profile sec-ir
 | EventBridge | 3 rules on the default bus matching AWS-service events | Events published by AWS services are free; rules are free. Custom/partner events would cost, none are used. | $0 |
 | Lambda | 128 MB, 30 s timeout, invoked only on matched events | Always free: 1M requests and 400k GB-seconds per month. | $0 |
 | CloudWatch Logs | Lambda log group, 7-day retention | 5 GB ingestion + storage free per month. CloudTrail → CloudWatch Logs delivery is **disabled** (that is where surprise costs usually come from). | $0 |
-| IAM | role, policy, test user | Always free. | $0 |
+| IAM | roles, policies, test user | Always free. | $0 |
+| EventBridge Scheduler | 1 schedule, `rate(5 minutes)`, invokes the trail health check (about 8,640 runs/month) | 14 million invocations free per month. | $0 |
+| Lambda (health check) | 128 MB, runs about 8,640 times/month, well under a second each | Inside the same always-free 1M requests and 400k GB-seconds. | $0 |
 | SNS | optional email topic (off by default) | 1,000 email notifications free per month. | $0 |
 | Out of scope | GuardDuty, Security Hub, Config, Macie, Inspector | Not free long-term; deliberately excluded. | n/a |
 

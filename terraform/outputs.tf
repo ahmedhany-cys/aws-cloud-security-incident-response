@@ -48,3 +48,15 @@ output "detection_rule_names" {
 output "sns_topic_arn" {
   value = var.enable_email_alerts ? aws_sns_topic.alerts[0].arn : null
 }
+
+output "trail_health_check_function_name" {
+  value = var.enable_trail_health_check ? aws_lambda_function.trail_health_check[0].function_name : null
+}
+
+output "trail_health_check_log_group" {
+  value = var.enable_trail_health_check ? aws_cloudwatch_log_group.health[0].name : null
+}
+
+output "trail_health_check_schedule" {
+  value = var.enable_trail_health_check ? "${aws_scheduler_schedule_group.project[0].name}/${aws_scheduler_schedule.trail_health_check[0].name}" : null
+}

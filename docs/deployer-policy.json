@@ -4,7 +4,9 @@
     {
       "Sid": "Identity",
       "Effect": "Allow",
-      "Action": ["sts:GetCallerIdentity"],
+      "Action": [
+        "sts:GetCallerIdentity"
+      ],
       "Resource": "*"
     },
     {
@@ -20,7 +22,9 @@
     {
       "Sid": "ListBucketsForConsoleAndT6",
       "Effect": "Allow",
-      "Action": ["s3:ListAllMyBuckets"],
+      "Action": [
+        "s3:ListAllMyBuckets"
+      ],
       "Resource": "*"
     },
     {
@@ -137,7 +141,10 @@
     {
       "Sid": "IamListForNegativeTest",
       "Effect": "Allow",
-      "Action": ["iam:ListUsers", "iam:ListPolicies"],
+      "Action": [
+        "iam:ListUsers",
+        "iam:ListPolicies"
+      ],
       "Resource": "*"
     },
     {
@@ -183,7 +190,9 @@
     {
       "Sid": "EventBridgeList",
       "Effect": "Allow",
-      "Action": ["events:ListRules"],
+      "Action": [
+        "events:ListRules"
+      ],
       "Resource": "*"
     },
     {
@@ -212,7 +221,9 @@
     {
       "Sid": "LogsDescribe",
       "Effect": "Allow",
-      "Action": ["logs:DescribeLogGroups"],
+      "Action": [
+        "logs:DescribeLogGroups"
+      ],
       "Resource": "*"
     },
     {
@@ -235,13 +246,46 @@
     {
       "Sid": "SnsSubscriptionAttributes",
       "Effect": "Allow",
-      "Action": ["sns:GetSubscriptionAttributes"],
+      "Action": [
+        "sns:GetSubscriptionAttributes"
+      ],
       "Resource": "*"
     },
     {
       "Sid": "TaggingApiForTeardownCheck",
       "Effect": "Allow",
-      "Action": ["tag:GetResources"],
+      "Action": [
+        "tag:GetResources"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "SchedulerProjectGroupAndSchedule",
+      "Effect": "Allow",
+      "Action": [
+        "scheduler:CreateSchedule",
+        "scheduler:GetSchedule",
+        "scheduler:UpdateSchedule",
+        "scheduler:DeleteSchedule",
+        "scheduler:CreateScheduleGroup",
+        "scheduler:GetScheduleGroup",
+        "scheduler:DeleteScheduleGroup",
+        "scheduler:TagResource",
+        "scheduler:UntagResource",
+        "scheduler:ListTagsForResource"
+      ],
+      "Resource": [
+        "arn:aws:scheduler:us-east-1:*:schedule-group/aws-sec-ir",
+        "arn:aws:scheduler:us-east-1:*:schedule/aws-sec-ir/*"
+      ]
+    },
+    {
+      "Sid": "SchedulerList",
+      "Effect": "Allow",
+      "Action": [
+        "scheduler:ListSchedules",
+        "scheduler:ListScheduleGroups"
+      ],
       "Resource": "*"
     }
   ]

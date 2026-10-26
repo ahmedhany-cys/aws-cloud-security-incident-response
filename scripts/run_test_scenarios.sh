@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Runs the controlled test scenarios T1-T6 against the dedicated TEST resources
+# Runs the controlled test scenarios T1-T7 against the dedicated TEST resources
 # only, restores state after each, and saves redacted evidence under
 # docs/evidence/. Usage:
-#   scripts/run_test_scenarios.sh            # all scenarios
+#   scripts/run_test_scenarios.sh            # all scenarios (T1-T7)
 #   scripts/run_test_scenarios.sh T1 T3      # a subset
 # Env: AWS_PROFILE (default sec-ir), INCIDENT_TIMEOUT (s, default 900),
 #      NEGATIVE_WINDOW (s, default 300)
@@ -110,7 +110,62 @@ t6() { # Negative test: benign calls must NOT create incidents
   fi
 }
 
-scenarios=("$@"); [ ${#scenarios[@]} -eq 0 ] && scenarios=(T1 T2 T3 T4 T5 T6)
+t7() { # Scheduled trail health check: stop logging, invoke the check, restart
+  # logging immediately -> CRITICAL TrailNotLogging incident. Then confirm the
+  # check reports healthy again and that EventBridge Scheduler invokes it.
+  local fn health_log
+  fn="$(tf_out trail_health_check_function_name)"
+  health_log="$(tf_out trail_health_check_log_group)"
+  [[ "$fn" == aws-sec-ir-trail-health-check ]] || die "unexpected health check function: $fn"
+  local resp="$EVIDENCE_RAW/T7-invoke-response.json" resp_ok="$EVIDENCE_RAW/T7-invoke-healthy-response.json"
+  local since; since="$(date +%s)"
+
+  save_evidence "T7-command.txt" -- aws cloudtrail stop-logging --name "$TRAIL_NAME"
+  save_evidence "T7-invoke.txt"  -- aws lambda invoke --function-name "$fn" --cli-binary-format raw-in-base64-out --payload '{}' "$resp"
+  save_evidence "T7-restore.txt" -- aws cloudtrail start-logging --name "$TRAIL_NAME"
+  save_evidence "T7-verify-restored.txt" -- aws cloudtrail get-trail-status --name "$TRAIL_NAME"
+  grep -q '"IsLogging": true' "$EVIDENCE_RAW/T7-verify-restored.txt" || die "T7: trail is NOT logging after restore - fix this before anything else"
+  "$REDACT" < "$resp" > "$EVIDENCE_DIR/T7-invoke-response.json"
+
+  local key
+  key="$(python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); print(d.get("key","") if d.get("status")=="incident" else "")' "$resp")"
+  if [ -z "$key" ]; then
+    record T7 TrailNotLogging FAIL "health check did not report an incident: $(tr -d '\n' < "$resp" | head -c 200)"
+    return 1
+  fi
+  save_evidence "T7-incident.json" -- aws s3 cp "s3://$INCIDENT_BUCKET/$key" -
+  grep -q '"severity": "CRITICAL"' "$EVIDENCE_DIR/T7-incident.json" || { record T7 TrailNotLogging FAIL "incident is not CRITICAL"; return 1; }
+
+  # Restored trail -> healthy, and no new incident.
+  local healthy_at; healthy_at="$(date +%s)"
+  save_evidence "T7-invoke-healthy.txt" -- aws lambda invoke --function-name "$fn" --cli-binary-format raw-in-base64-out --payload '{}' "$resp_ok"
+  "$REDACT" < "$resp_ok" > "$EVIDENCE_DIR/T7-invoke-healthy-response.json"
+  grep -q '"status": "healthy"' "$resp_ok" || { record T7 TrailNotLogging FAIL "check did not report healthy after restore"; return 1; }
+
+  save_evidence "T7-lambda-log.txt" -- aws logs filter-log-events --log-group-name "$health_log" \
+    --start-time "$(( since * 1000 ))" --filter-pattern '"incident_written"' --query 'events[].message' --output text
+
+  # Scheduler: wait for an invocation we did not make (a trail_healthy line
+  # logged after our manual healthy check).
+  local deadline=$(( $(date +%s) + ${SCHEDULE_TIMEOUT:-420} )) n=0
+  while [ "$(date +%s)" -lt "$deadline" ]; do
+    n="$(aws logs filter-log-events --log-group-name "$health_log" --start-time "$(( (healthy_at + 5) * 1000 ))" \
+          --filter-pattern '"trail_healthy"' --query 'length(events)' --output text 2>/dev/null || echo 0)"
+    [ "${n:-0}" -ge 1 ] && break
+    log "T7: waiting for a scheduled health check run ... ($(( deadline - $(date +%s) ))s left)"
+    sleep 30
+  done
+  save_evidence "T7-scheduled-run-log.txt" -- aws logs filter-log-events --log-group-name "$health_log" \
+    --start-time "$(( (healthy_at + 5) * 1000 ))" --filter-pattern '"trail_healthy"' --query 'events[].message' --output text
+  if [ "${n:-0}" -ge 1 ]; then
+    record T7 TrailNotLogging PASS "$key; scheduled run observed"
+  else
+    record T7 TrailNotLogging FAIL "incident ok ($key) but no scheduled run within ${SCHEDULE_TIMEOUT:-420}s"
+    return 1
+  fi
+}
+
+scenarios=("$@"); [ ${#scenarios[@]} -eq 0 ] && scenarios=(T1 T2 T3 T4 T5 T6 T7)
 printf 'scenario\tevent\tresult\tdetail\n' > "$RESULTS_FILE"
 status=0
 for s in "${scenarios[@]}"; do
@@ -118,6 +173,7 @@ for s in "${scenarios[@]}"; do
   case "$s" in
     T1) t1 || status=1 ;; T2) t2 || status=1 ;; T3) t3 || status=1 ;;
     T4) t4 || status=1 ;; T5) t5 || status=1 ;; T6) t6 || status=1 ;;
+    T7) t7 || status=1 ;;
     *) die "unknown scenario $s" ;;
   esac
 done

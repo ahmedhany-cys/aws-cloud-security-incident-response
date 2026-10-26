@@ -6,3 +6,7 @@ bucket_suffix = "abc1234" # your initials + 4 digits, lowercase
 # Optional email alerts (off by default)
 enable_email_alerts = false
 alert_email         = ""
+
+# Scheduled trail health check (on by default)
+enable_trail_health_check   = true
+trail_health_check_schedule = "rate(5 minutes)"
