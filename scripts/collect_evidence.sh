@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Collects general (non-scenario) evidence about the deployed stack and saves
 # redacted copies under docs/evidence/. Safe: read-only AWS calls.
+# shellcheck source=scripts/common.sh
 source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 load_outputs
 
