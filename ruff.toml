@@ -1,0 +1,9 @@
+# Ruff configuration. Explicit rule set (pyflakes + core pycodestyle errors),
+# matched to the Lambda runtime, so results do not depend on any machine-level
+# ruff settings. Run: ruff check lambda tests
+target-version = "py312"
+line-length = 100
+extend-exclude = ["docs", "terraform", ".venv"]
+
+[lint]
+select = ["E4", "E7", "E9", "F"]

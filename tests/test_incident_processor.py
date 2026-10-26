@@ -231,7 +231,7 @@ def test_handler_reraises_s3_errors(monkeypatch, capsys):
 
 def test_logs_are_json_lines(fake_clients, capsys):
     ip.handler(load("put_user_policy.json"), None)
-    lines = [l for l in capsys.readouterr().out.splitlines() if l.strip()]
+    lines = [line for line in capsys.readouterr().out.splitlines() if line.strip()]
     assert lines, "handler must log"
     parsed = json.loads(lines[-1])
     assert parsed["message"] == "incident_written"
