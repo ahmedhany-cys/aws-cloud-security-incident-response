@@ -40,7 +40,7 @@ runs under `docs/evidence/` and `docs/screenshots/`.
 - GitHub secret scanning and push protection are enabled on the repository.
 - Dependabot keeps the Terraform providers, Python dev dependencies and GitHub
   Actions current.
-- CI runs the unit tests, Ruff, ShellCheck, `terraform fmt` and
-  `terraform validate` on every push and pull request.
+- CI runs the unit tests, Ruff, ShellCheck, `terraform fmt`, `terraform validate`
+  and a docs link check on every pull request and every push to `main`.
 - The Lambda has no third-party runtime dependencies (boto3 ships with the
   runtime), which keeps the supply-chain surface small.
