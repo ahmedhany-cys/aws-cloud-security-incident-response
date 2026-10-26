@@ -86,3 +86,8 @@ Running record of what was done, what was verified, and decisions taken.
 - Plan shown to the owner and approved: 8 add, 1 change (incident processor code), 0 destroy. Applied: "8 added, 1 changed, 0 destroyed."
 - T7 run 4: health check worked (CRITICAL incident, healthy after restore, 2 scheduled runs) but recorded FAIL because the script counted runs with `length(events)` and the CLI printed one value per page. Kept as evidence, fixed the counter (`wc -w` over event IDs), reran.
 - T7 run 5: PASS. Trail logging again; `terraform plan` shows no drift.
+
+## 2026-10-26 — Commit attribution cleanup (owner's request)
+
+- Removed the `Co-Authored-By` trailer from all 14 commits (`git filter-branch --msg-filter`; file contents unchanged, verified with an empty diff) and force-pushed `main` with a lease, after the owner allowed force-push for this repo.
+- Verified on GitHub: 14 commits, 0 co-author lines, only `ahmedhany-cys` as author, `stats/contributors` = `ahmedhany-cys: 14`. The repo page's contributor sidebar is cached separately and refreshes on the next push.
