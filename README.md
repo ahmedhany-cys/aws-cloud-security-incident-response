@@ -20,6 +20,10 @@ EventBridge (default bus) rules --match suspicious API calls--> Lambda incident-
                                                               (optional) SNS email
 ```
 
+A second, independent path covers the case where the trail itself is switched
+off: EventBridge Scheduler runs a health-check Lambda every 5 minutes that calls
+`GetTrailStatus` and writes a CRITICAL incident if the trail is not logging.
+
 Full diagram and component descriptions: [docs/architecture.md](docs/architecture.md).
 
 ## Detection rules
@@ -28,6 +32,7 @@ Full diagram and component descriptions: [docs/architecture.md](docs/architectur
 |---|---|---|---|
 | IAM policy change | `aws.iam` | AttachUserPolicy, AttachRolePolicy, AttachGroupPolicy, PutUserPolicy, PutRolePolicy, PutGroupPolicy, CreatePolicy, CreatePolicyVersion, SetDefaultPolicyVersion | HIGH |
 | Logging tamper | `aws.cloudtrail` | StopLogging, DeleteTrail, UpdateTrail, PutEventSelectors | CRITICAL |
+| Trail not logging / missing (scheduled check) | EventBridge Scheduler, every 5 min | `TrailNotLogging`, `TrailMissing` (from `GetTrailStatus`) | CRITICAL |
 | S3 permission change | `aws.s3` | PutBucketPolicy, DeleteBucketPolicy, PutBucketAcl, PutBucketPublicAccessBlock, DeleteBucketPublicAccessBlock, PutAccountPublicAccessBlock, DeleteAccountPublicAccessBlock | HIGH |
 
 The rule patterns use CloudTrail **event** names, which are not always the API
@@ -72,10 +77,13 @@ terraform -chdir=terraform plan -out=tfplan
 terraform -chdir=terraform apply tfplan
 ```
 
-Expected: 1 trail, 3 buckets (each with versioning, encryption, lifecycle,
+Expected: 45 resources. 1 trail, 3 buckets (each with versioning, encryption, lifecycle,
 public access block, ownership controls, policy), 3 EventBridge rules + 3
 targets + 3 Lambda permissions, 1 Lambda + role + inline policy + log group,
-1 test user, 1 test policy. Nothing is created outside us-east-1.
+1 test user, 1 test policy, and the health check (1 Lambda + role + policy +
+log group, 1 schedule group, 1 schedule, 1 scheduler role + policy). Set
+`enable_trail_health_check = false` to leave it out. Nothing is created
+outside us-east-1.
 
 ## Run the tests
 
@@ -103,7 +111,7 @@ results: [docs/test-cases.md](docs/test-cases.md).
 
 ## Results summary
 
-Tested on 2026-10-26. Unit tests: 24 passed.
+Tested on 2026-10-26. Unit tests: 32 passed.
 
 | ID | Scenario | Expected | Result |
 |---|---|---|---|
@@ -113,10 +121,12 @@ Tested on 2026-10-26. Unit tests: 24 passed.
 | T4 | Test-bucket policy change | HIGH `PutBucketPolicy` | PASS |
 | T5 | Test-bucket public access block removed | HIGH `DeleteBucketPublicAccessBlock` | PASS after fixing the rule's event names |
 | T6 | Benign calls | no incident | PASS |
+| T7 | Scheduled trail health check, trail stopped | CRITICAL `TrailNotLogging` | PASS |
 
 Incidents landed in S3 between 2 and 30 seconds after each API call. T3 is
 partial because stopping the account's only trail can stop EventBridge from
-receiving that same event; see
+receiving that same event. The scheduled trail health check (T7) closes that
+gap by asking CloudTrail every 5 minutes whether the trail is logging; see
 [design decisions, section 12](docs/design-decisions.md#12-the-stoplogging-blind-spot-observed-in-testing).
 Full results: [docs/test-cases.md](docs/test-cases.md). Redacted evidence:
 [docs/evidence/](docs/evidence/README.md).
@@ -152,7 +162,6 @@ Empty the versioned buckets, then `terraform destroy`, then confirm no
 
 ## Future improvements
 
-- Scheduled trail health check (EventBridge Scheduler + `GetTrailStatus`) to close the `StopLogging` blind spot found in T3.
 - Root console sign-in detection (`aws.signin` / `ConsoleLogin` with `userIdentity.type = Root`).
 - Access-key and user creation detection (`CreateAccessKey`, `CreateUser`, `CreateLoginProfile`).
 - SNS email (already wired, `enable_email_alerts = true`) or Slack via a webhook Lambda.

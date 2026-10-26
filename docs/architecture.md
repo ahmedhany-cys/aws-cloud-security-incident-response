@@ -36,6 +36,14 @@ flowchart LR
     L -->|PutObject incidents/* only| INC
     L --> CW
     L -.->|if enabled| SNS
+
+    subgraph Health["Scheduled trail health check"]
+        SCH[EventBridge Scheduler<br/>rate 5 minutes]
+        HL[Lambda trail-health-check]
+    end
+    SCH -->|invoke via scheduler role| HL
+    HL -->|GetTrailStatus| CT
+    HL -->|CRITICAL TrailNotLogging| INC
 ```
 
 > `architecture.png`: not generated. No Mermaid renderer (`mmdc` / Node.js) is installed on the build machine, and installing one was not approved, so only the Mermaid source is provided. GitHub renders it inline. To export a PNG: `npm i -g @mermaid-js/mermaid-cli && mmdc -i docs/architecture.md -o docs/architecture.png`.
@@ -51,6 +59,8 @@ flowchart LR
 **S3 buckets.** Three buckets: `audit-logs` (CloudTrail), `incident-reports` (Lambda output) and `test-bucket` (the only bucket the test scenarios may modify). All have Block Public Access, ACLs disabled, versioning, SSE-S3, a 30-day/7-day lifecycle and a deny-non-TLS bucket policy. The audit bucket additionally lets `cloudtrail.amazonaws.com` write, restricted to this trail's ARN via `aws:SourceArn`.
 
 **Test resources.** An IAM user with no credentials or permissions, a managed policy that allows only `sts:GetCallerIdentity`, and the test bucket. Scenarios T1 to T5 act on these and restore them afterwards.
+
+**Scheduled trail health check.** EventBridge Scheduler invokes `aws-sec-ir-trail-health-check` every 5 minutes through a role that can invoke only that function. The function calls `cloudtrail:GetTrailStatus` on the project trail. If the trail is not logging, or no longer exists, it writes a CRITICAL incident to the same bucket and schema with `detection_source: scheduled_health_check`. This path exists because test T3 showed that stopping the only trail can stop EventBridge from receiving the `StopLogging` event itself. One incident is written per stop: repeated checks while the trail stays off overwrite the same object.
 
 **Optional SNS topic.** Created only when `enable_email_alerts = true`; the Lambda then publishes each report to it.
 

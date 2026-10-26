@@ -77,3 +77,12 @@ Running record of what was done, what was verified, and decisions taken.
 - Hygiene checks on HEAD and full history: no state/tfvars/env/pem tracked (only `terraform.tfvars.example`); every 12-digit hit reviewed and placeholder-only (fake sequential UUIDs in test events/docs, provider checksums in `.terraform.lock.hcl`); no `AKIA` keys; the real account ID and the owner's Gmail address appear in zero commits. `gitleaks` not installed, so skipped.
 - Commit authorship rewritten (before the first push) to the GitHub no-reply address so the owner's email is not published.
 - Created public repo `ahmedhany-cys/aws-cloud-security-incident-response` with `gh repo create --public --source . --push`.
+
+## 2026-10-26 — Scheduled trail health check (owner approved)
+
+- Owner approved building the fix for the T3 blind spot. Added `health_check_handler` (same module and zip as the incident processor), `terraform/health_check.tf` (Lambda, least-privilege role, 7-day log group, Scheduler group + schedule at `rate(5 minutes)`, scheduler role limited to invoking that one function), 8 unit tests (32 total pass), scenario T7, and new field `detection_source` in all reports.
+- Verified against the AWS service reference: `cloudtrail:GetTrailStatus` supports the trail resource type (no `*`), and all Scheduler actions scope to `schedule-group/aws-sec-ir` and `schedule/aws-sec-ir/*`.
+- Deployer lacked Scheduler permissions (confirmed by an AccessDenied on `ListScheduleGroups`). Drafted the two new statements; the owner's first edit did not save (policy still v1), second edit saved as v2 and was verified before applying.
+- Plan shown to the owner and approved: 8 add, 1 change (incident processor code), 0 destroy. Applied: "8 added, 1 changed, 0 destroyed."
+- T7 run 4: health check worked (CRITICAL incident, healthy after restore, 2 scheduled runs) but recorded FAIL because the script counted runs with `length(events)` and the CLI printed one value per page. Kept as evidence, fixed the counter (`wc -w` over event IDs), reran.
+- T7 run 5: PASS. Trail logging again; `terraform plan` shows no drift.

@@ -94,15 +94,15 @@ T4 and T5 put the test bucket back the way it was (re-apply the bucket policy, r
 
 **Why it matters.** This is exactly the attack the CRITICAL rule exists for: an attacker who stops the only trail can also blind the detection of that stop. Detection is best-effort, not guaranteed, in a single-trail account.
 
-**Fixes, and why none is built in.**
-- *Scheduled health check.* An EventBridge Scheduler job every few minutes runs a small Lambda that calls `cloudtrail:GetTrailStatus` and writes a CRITICAL incident if `IsLogging` is false. This would likely stay inside the free tier, but it adds a service the spec does not list, so it needs the owner's approval first.
+**Fixes considered.**
+- *Scheduled health check (built, with the owner's approval on 2026-10-26).* EventBridge Scheduler runs a small Lambda every 5 minutes. It calls `cloudtrail:GetTrailStatus` and writes a CRITICAL incident if `IsLogging` is false or the trail is gone. It does not depend on CloudTrail delivering anything, so it cannot be blinded by the very action it watches. Trade-offs: detection takes up to about 5 minutes instead of seconds, and the report cannot name the actor, so it points to `lookup-events`. Cost: about 8,640 runs a month, far inside the free tiers. Its role can read only this trail's status, write only under `incidents/`, and log only to its own group; the scheduler role can invoke only this one function, with an `aws:SourceAccount` condition. Test T7 proves it.
 - *A second trail, or an organization trail in a separate account.* Then stopping one trail does not blind EventBridge. A second copy of management events is billed, so it is outside the cost guardrails.
 - *Preventive control.* An SCP or IAM deny on `cloudtrail:StopLogging` / `DeleteTrail` for everyone except a break-glass role. This needs AWS Organizations for SCPs.
 
 ## 13. Known limitations
 
 - Detection latency depends on CloudTrail → EventBridge delivery. In testing it was 2 to 30 seconds.
-- `StopLogging` on the account's only trail is detected only sometimes (see section 12).
+- `StopLogging` on the account's only trail is not always caught by the EventBridge path (see section 12); the scheduled health check catches the stopped trail within about 5 minutes instead.
 - Only management events; no S3 object-level or Lambda data events.
 - Single account, single region.
 - No automated remediation (for example, automatically re-enabling logging). The report recommends actions; a human applies them. This was deliberate: automated remediation needs broader IAM permissions, which contradicts the least-privilege goal of the responder.

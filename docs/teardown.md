@@ -51,7 +51,13 @@ terraform -chdir=terraform apply tfplan-destroy
 aws resourcegroupstaggingapi get-resources --tag-filters Key=Project,Values=aws-sec-ir --region us-east-1 --profile sec-ir --query 'ResourceTagMappingList[].ResourceARN'
 ```
 
-Expected: `[]`. IAM resources are not returned by the tagging API, so also run:
+Expected: `[]`. IAM resources and the schedule itself are not returned by the tagging API, so also run:
+
+```bash
+aws scheduler list-schedule-groups --region us-east-1 --profile sec-ir --query "ScheduleGroups[?Name=='aws-sec-ir'].Name"
+```
+
+Expected: `[]`.
 
 ```bash
 aws iam list-roles --path-prefix / --query "Roles[?starts_with(RoleName,'aws-sec-ir')].RoleName" --profile sec-ir

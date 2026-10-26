@@ -27,7 +27,18 @@ duplicate (idempotent writes).
 | `error_code` | string or null | `detail.errorCode` | Present for denied/failed attempts, which are still worth an incident |
 | `error_message` | string or null | `detail.errorMessage` | |
 | `recommended_actions[]` | list of string | lookup table | Analyst playbook for this category |
-| `raw_event_id` | string | `detail.eventID` | Use with `aws cloudtrail lookup-events` to fetch the full record |
+| `raw_event_id` | string | `detail.eventID` | Use with `aws cloudtrail lookup-events` to fetch the full record. For health-check incidents it is the incident reference instead |
+| `detection_source` | `eventbridge` / `scheduled_health_check` | handler | Which path detected it |
+
+## Health-check incidents
+
+The scheduled trail health check writes the same schema with these differences:
+
+- `event_name` is a synthetic name: `TrailNotLogging` (from `GetTrailStatus`, `IsLogging = false`) or `TrailMissing` (`TrailNotFoundException`).
+- `event_time` is the trail's `StopLoggingTime`; for a missing trail it is the detection time.
+- `actor`, `source_ip` and `user_agent` are null, because `GetTrailStatus` does not say who stopped the trail. The first recommended action shows the `lookup-events` command that finds out.
+- `request_parameters` holds the status fields `is_logging`, `stop_logging_time`, `start_logging_time` and `latest_delivery_error`.
+- The key is `incidents/YYYY/MM/DD/trail-health-<trail>-<problem>-<stop epoch>.json`, so one stop gives one incident however many checks run.
 
 ## Severity table (lookup in `lambda/incident_processor.py`)
 
@@ -36,6 +47,7 @@ duplicate (idempotent writes).
 | `iam_policy_change` | AttachUserPolicy, AttachRolePolicy, AttachGroupPolicy, PutUserPolicy, PutRolePolicy, PutGroupPolicy, CreatePolicy, CreatePolicyVersion, SetDefaultPolicyVersion | HIGH |
 | `logging_tamper` | StopLogging, DeleteTrail, UpdateTrail, PutEventSelectors | CRITICAL |
 | `s3_permission_change` | PutBucketPolicy, DeleteBucketPolicy, PutBucketAcl, PutBucketPublicAccessBlock, DeleteBucketPublicAccessBlock, PutAccountPublicAccessBlock, DeleteAccountPublicAccessBlock | HIGH |
+| `logging_tamper` (scheduled check) | TrailNotLogging, TrailMissing | CRITICAL |
 | `unclassified` | anything else that reaches the Lambda | MEDIUM |
 
 ## Example

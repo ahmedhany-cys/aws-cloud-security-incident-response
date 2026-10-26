@@ -16,6 +16,7 @@ observed within the timeout; NOT RUN = not executed yet.
 | T3 | Disable logging | project trail | `aws cloudtrail stop-logging` | `start-logging` immediately; `get-trail-status` must show `IsLogging: true` | CRITICAL incident, `StopLogging` | **PARTIAL: 2 of 3 attempts** (see below) | `T3-*`, `run1/T3-*`, `run2-T3/` |
 | T4 | S3 policy change | test bucket | `aws s3api put-bucket-policy` (harmless deny-non-TLS policy with a marker Sid) | `delete-bucket-policy`, then re-put the original policy | HIGH incident, `PutBucketPolicy` | **PASS** | `T4-*` |
 | T5 | Public access block removal | test bucket | `aws s3api delete-public-access-block` (CloudTrail event name: `DeleteBucketPublicAccessBlock`) | `put-public-access-block` with all four flags true | HIGH incident, `DeleteBucketPublicAccessBlock` | **PASS** after a rule fix (failed on run 1) | `T5-*`, `run1/T5-attempt1-diagnosis.txt` |
+| T7 | Scheduled trail health check | project trail | `aws cloudtrail stop-logging`, then invoke the health-check Lambda | `start-logging` immediately; `get-trail-status` must show `IsLogging: true`; a second check must report healthy | CRITICAL `TrailNotLogging` incident, plus at least one run triggered by EventBridge Scheduler | **PASS** (run 5) | `T7-*`, `run4-T7-scriptbug/` |
 | T6 | Negative test | none | `aws iam list-users`, `aws s3 ls` | n/a | **No** incident within the window | **PASS** | `T6-*` |
 
 ## Unit tests (no AWS access)
@@ -25,7 +26,7 @@ actor extraction (IAM user, assumed role, root), sanitization of secrets,
 idempotent key naming, the S3 write, optional SNS publish, loud failure on bad
 input or S3 errors, and JSON-line logging.
 
-Latest run: 24 passed (2026-10-26), including a regression test for the S3 event-name bug.
+Latest run: 32 passed (2026-10-26), including a regression test for the S3 event-name bug and 8 tests for the trail health check (healthy, stopped, missing trail, repeated checks, error handling).
 
 ## Run log
 
@@ -45,6 +46,8 @@ which confirms every scenario restored its target.
 | T4 | run 2 | PASS | `PutBucketPolicy` HIGH incident. The restore steps also raised `DeleteBucketPolicy` and `PutBucketPolicy` incidents, which is correct. Original policy restored. |
 | T5 | run 1 | **FAIL** | No incident. The rule listed the API name `DeletePublicAccessBlock`; CloudTrail logs `DeleteBucketPublicAccessBlock`. |
 | T5 | run 2 | PASS | After the rule fix: `DeleteBucketPublicAccessBlock` HIGH incident, and the restore raised a `PutBucketPublicAccessBlock` incident. All four block flags back on. |
+| T7 | run 4 | **FAIL (script bug)** | The check wrote the CRITICAL incident, reported healthy after the restore, and ran twice on schedule. The script's run counter used `length(events)`, which the CLI prints once per page, so the integer test broke. Script fixed. |
+| T7 | run 5 | PASS | CRITICAL `TrailNotLogging` incident while the trail was stopped (a few seconds), `healthy` after restore, and a scheduler-triggered run within about a minute. |
 | T6 | run 2 | PASS | `aws iam list-users` and `aws s3 ls` produced no incident. Newest object in the incident bucket predates T6, and the Lambda logged nothing. |
 
 ### T3: why it is only partial
@@ -56,6 +59,14 @@ attempts were detected. This is a real limitation of a single-trail design,
 explained with possible fixes in
 [design-decisions.md](design-decisions.md#12-the-stoplogging-blind-spot-observed-in-testing).
 The failed attempt's evidence is in `evidence/run2-T3/T3-diagnosis.txt`.
+
+### T7: closing the T3 gap
+
+T7 tests the scheduled health check added after T3 was found to be partial.
+It does not rely on CloudTrail delivering the `StopLogging` event: it asks
+CloudTrail directly whether the trail is logging. With the schedule at 5
+minutes, a stopped trail is reported within at most about 5 minutes, even when
+EventBridge misses the `StopLogging` event.
 
 ### T5: the bug it found
 
