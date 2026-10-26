@@ -39,3 +39,10 @@ Running record of what was done, what was verified, and decisions taken.
 
 - User reported an error while setting up. The terminal showed none and the `sec-ir` profile did not exist yet, so the likely source was the console policy editor.
 - Checked all 135 actions in `docs/deployer-policy.json` against the AWS service reference JSON (servicereference.us-east-1.amazonaws.com). One was invalid: `budgets:DescribeBudgets` (an API name; the IAM action is `budgets:ViewBudget`, already present). Removed it. Re-check: 0 invalid actions. Policy size 4.9k of the 6,144-character limit.
+
+## 2026-10-26 — Console setup in the built-in browser (at the user's request)
+
+- User was signed in to the console in the built-in browser as their own IAM user (not root). Claude fixed the policy editor error in place (deleted the invalid `budgets:DescribeBudgets` line; editor then reported 0 errors). The user clicked Create; console confirmed "Policy aws-sec-ir-deployer-policy created."
+- Claude created IAM user `aws-sec-ir-deployer`: console access disabled, `aws-sec-ir-deployer-policy` attached directly, tag `Project=aws-sec-ir`. Verified on the user's Permissions tab.
+- Validator suggestions (4, all "redundant action/resource" from the `s3:GetBucket*`/`s3:PutBucket*` wildcards and overlapping ARN patterns) left as is: harmless, and the explicit names aid review.
+- Not done by Claude, by rule: access key creation (CLAUDE.md rule 4 + kickoff rule), billing budget (Phase 0 says do not create billing resources), GitHub OAuth approval (user's own login). Started `gh auth login --web` in a terminal tab for the user to complete.

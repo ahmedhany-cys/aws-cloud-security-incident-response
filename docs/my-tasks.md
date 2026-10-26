@@ -66,7 +66,9 @@ python3 -m pip install --user boto3 pytest
 
 ---
 
-## 2. Create the dedicated IAM user and access key — BLOCKING
+## 2. Create the dedicated IAM user and access key — PARTLY DONE
+
+> **Status 2026-10-26:** Claude created the user `aws-sec-ir-deployer` in the console at your request: console access disabled, `aws-sec-ir-deployer-policy` attached directly, tag `Project = aws-sec-ir`. **Still to do by you:** sub-steps 6 to 8 (create the access key) and the `aws configure --profile sec-ir` part. Claude must never create access keys or handle the secret.
 
 **Why:** The build must never use your root account. A dedicated user with a single access key can be deleted at the end, which limits the damage if the key ever leaks.
 
@@ -104,7 +106,7 @@ aws sts get-caller-identity --profile sec-ir
 
 ---
 
-## 3. Review and attach the deployer policy — BLOCKING
+## 3. Review and attach the deployer policy — DONE (policy created by you 2026-10-26; attached to the user by Claude)
 
 **Why:** The deployer user needs just enough permission to create the resources in CLAUDE.md and nothing more. Claude drafts the policy as `docs/deployer-policy.json`; you review and attach it, so Claude never grants itself permissions.
 
@@ -139,7 +141,7 @@ aws sts get-caller-identity --profile sec-ir
 
 ---
 
-## 5. Sign in to GitHub from the terminal — BLOCKING (needed at the end)
+## 5. Sign in to GitHub from the terminal — IN PROGRESS (Claude started `gh auth login --web` in the "GitHub login" terminal tab; you answer the prompts and approve in the browser)
 
 **Why:** Claude creates the public repo `aws-cloud-security-incident-response` and pushes with the `gh` CLI, which needs your GitHub login. The login flow uses a browser code, so you must do it yourself.
 
@@ -221,5 +223,6 @@ terraform destroy -var-file=terraform.tfvars
 
 (Claude appends to this list as the build runs.)
 
+- 2026-10-26: the console policy editor rejected `budgets:DescribeBudgets` (not an IAM action). Removed from `docs/deployer-policy.json`. **Done.**
 - 2026-10-23: no Mermaid renderer (`mmdc`, Node) is installed, so `docs/architecture.png` is not generated; the Mermaid source in `docs/architecture.md` renders on GitHub. Optional: `brew install node && npm i -g @mermaid-js/mermaid-cli`, then tell Claude to export the PNG. **To do (optional).**
 - 2026-10-23: `gitleaks` is not installed; the hygiene checks will use the three `git grep` checks from CLAUDE.md. Optional: `brew install gitleaks`. **To do (optional).**
