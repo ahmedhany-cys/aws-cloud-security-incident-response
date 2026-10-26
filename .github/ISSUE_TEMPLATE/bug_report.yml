@@ -1,0 +1,46 @@
+name: Bug report
+description: Something deployed, detected or documented incorrectly
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. Please redact account IDs, IP addresses, access key IDs and principal IDs before pasting anything.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Terraform / deployment
+        - Detection rule (EventBridge pattern)
+        - Lambda incident processor
+        - Trail health check
+        - Test scripts / evidence collection
+        - Documentation
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What did you do, and what did you observe?
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant output (redacted)
+      description: terraform output, Lambda log lines, an incident JSON, or a CloudTrail record
+      render: shell
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      placeholder: "terraform 1.x, aws provider 5.x, python 3.12"
