@@ -24,5 +24,9 @@ for b in "$(tf_out audit_bucket)" "$INCIDENT_BUCKET" "$TEST_BUCKET"; do
   save_evidence "10-bucket-$b-lifecycle.json" -- aws s3api get-bucket-lifecycle-configuration --bucket "$b"
 done
 save_evidence "11-incident-objects.txt"  -- aws s3 ls "s3://$INCIDENT_BUCKET/incidents/" --recursive
+if [ "$(tf_out trail_health_check_function_name 2>/dev/null)" != "null" ] && tf_out trail_health_check_function_name >/dev/null 2>&1; then
+  save_evidence "13-health-check-lambda-config.json" -- aws lambda get-function-configuration --function-name "$(tf_out trail_health_check_function_name)"
+  save_evidence "14-health-check-schedule.json" -- aws scheduler get-schedule --group-name aws-sec-ir --name aws-sec-ir-trail-health-check
+fi
 save_evidence "12-project-tagged-resources.json" -- aws resourcegroupstaggingapi get-resources --tag-filters Key=Project,Values=aws-sec-ir --query 'ResourceTagMappingList[].ResourceARN'
 log "done"

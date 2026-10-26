@@ -149,8 +149,10 @@ t7() { # Scheduled trail health check: stop logging, invoke the check, restart
   # logged after our manual healthy check).
   local deadline=$(( $(date +%s) + ${SCHEDULE_TIMEOUT:-420} )) n=0
   while [ "$(date +%s)" -lt "$deadline" ]; do
+    # Count event IDs, not length(events): the CLI paginates and would print
+    # one length per page ("2" then "0"), which is not a single integer.
     n="$(aws logs filter-log-events --log-group-name "$health_log" --start-time "$(( (healthy_at + 5) * 1000 ))" \
-          --filter-pattern '"trail_healthy"' --query 'length(events)' --output text 2>/dev/null || echo 0)"
+          --filter-pattern '"trail_healthy"' --query 'events[].eventId' --output text 2>/dev/null | wc -w | tr -d ' ')"
     [ "${n:-0}" -ge 1 ] && break
     log "T7: waiting for a scheduled health check run ... ($(( deadline - $(date +%s) ))s left)"
     sleep 30
