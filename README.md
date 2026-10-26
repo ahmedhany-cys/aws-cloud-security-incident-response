@@ -115,7 +115,7 @@ Report format: [docs/incident-schema.md](docs/incident-schema.md).
 | Response | AWS Lambda, Python 3.12, boto3 only | No third-party runtime dependencies; least-privilege execution role |
 | Storage | S3 with SSE-S3, versioning, lifecycle expiry, Block Public Access, TLS-only policies | Audit logs and incident reports kept separate and hardened |
 | Testing | pytest (32 unit tests, no AWS access) and a Bash scenario runner with evidence collection and redaction | Detections are proven end to end, not assumed |
-| Quality | GitHub Actions (pytest, Ruff, ShellCheck, `terraform validate`) and Dependabot | Every change is checked; dependencies stay current |
+| Quality | GitHub Actions (pytest, Ruff, ShellCheck, `terraform validate`, docs link check) and Dependabot | Every change is checked; dependencies stay current |
 
 ## Repository layout
 
@@ -123,7 +123,8 @@ Report format: [docs/incident-schema.md](docs/incident-schema.md).
 terraform/   root module (s3, cloudtrail, detection, responder, notifications, test_resources)
 lambda/      incident_processor.py (no third-party dependencies)
 tests/       pytest unit tests + sample EventBridge events
-scripts/     run_test_scenarios.sh, collect_evidence.sh, redact.sh, empty_bucket.sh
+scripts/     run_test_scenarios.sh, collect_evidence.sh, common.sh (shared helpers),
+             redact.sh, empty_bucket.sh, check_docs_links.py
 docs/        architecture, design decisions, test cases, schema, cost notes, teardown,
              evidence/ (redacted outputs), screenshots/ (redacted PNGs + checklist)
 ```
@@ -168,7 +169,7 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
 .venv/bin/python -m pytest
 ```
 
-Controlled end-to-end scenarios (T1 to T6, each restores state afterwards):
+Controlled end-to-end scenarios (T1 to T7, each restores state afterwards):
 
 ```bash
 AWS_PROFILE=sec-ir scripts/run_test_scenarios.sh
@@ -185,15 +186,16 @@ results: [docs/test-cases.md](docs/test-cases.md).
 
 ## Continuous integration
 
-Every push and pull request runs [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
-without AWS credentials:
+Every pull request and every push to `main` runs
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) without AWS credentials:
 
 | Job | What it checks |
 |---|---|
 | `pytest` | Unit tests on Python 3.12 (the Lambda runtime) and 3.13 |
-| `Ruff` | Lint for `lambda/` and `tests/` ([ruff.toml](ruff.toml)) |
+| `Ruff` | Lint for `lambda/`, `tests/` and `scripts/` ([ruff.toml](ruff.toml)) |
 | `Terraform fmt + validate` | `terraform fmt -check`, `init -backend=false`, `validate` |
-| `ShellCheck` | Static analysis of every script in `scripts/` |
+| `ShellCheck` | Static analysis of every shell script in `scripts/` |
+| `Docs links` | Every relative link and image in the Markdown files points at a file that exists ([scripts/check_docs_links.py](scripts/check_docs_links.py)) |
 
 [Dependabot](.github/dependabot.yml) opens weekly pull requests for the
 Terraform providers, the Python dev dependencies and the GitHub Actions.
