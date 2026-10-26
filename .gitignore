@@ -1,0 +1,30 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+tfplan
+crash.log
+.terraform.lock.hcl.bak
+
+# Secrets / local env
+.env
+*.pem
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+
+# Lambda build artefacts
+lambda/*.zip
+terraform/.build/
+
+# Raw (unredacted) evidence and screenshots never leave this machine
+docs/evidence/raw/
+docs/screenshots/raw/
+
+# OS
+.DS_Store

@@ -1,0 +1,8 @@
+# Copy to terraform.tfvars (gitignored) and edit.
+aws_profile   = "sec-ir"
+aws_region    = "us-east-1"
+bucket_suffix = "abc1234" # your initials + 4 digits, lowercase
+
+# Optional email alerts (off by default)
+enable_email_alerts = false
+alert_email         = ""

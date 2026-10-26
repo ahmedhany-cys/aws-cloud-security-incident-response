@@ -1,0 +1,37 @@
+{
+  "version": "0",
+  "id": "11111111-2222-3333-4444-555555555555",
+  "detail-type": "AWS API Call via CloudTrail",
+  "source": "aws.s3",
+  "account": "123456789012",
+  "time": "2026-10-23T10:15:30Z",
+  "region": "us-east-1",
+  "resources": ["arn:aws:events:us-east-1:123456789012:rule/aws-sec-ir-s3-permission-change"],
+  "detail": {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLEPRINCIPAL",
+      "arn": "arn:aws:iam::123456789012:user/aws-sec-ir-deployer",
+      "accountId": "123456789012",
+      "accessKeyId": "AKIAEXAMPLEEXAMPLE1",
+      "userName": "aws-sec-ir-deployer"
+    },
+    "eventTime": "2026-10-23T10:15:28Z",
+    "eventSource": "s3.amazonaws.com",
+    "eventName": "DeletePublicAccessBlock",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "203.0.113.10",
+    "userAgent": "aws-cli/2.36.40 md/awscrt#0.27.0 ua/2.0 os/macos#24.6.0",
+    "requestParameters": {"bucketName": "aws-sec-ir-test-bucket-abc1234", "Host": "s3.amazonaws.com", "publicAccessBlock": ""},
+    "responseElements": null,
+    "requestID": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+    "eventID": "e1000005-0000-4000-8000-000000000005",
+    "readOnly": false,
+    "eventType": "AwsApiCall",
+    "managementEvent": true,
+    "recipientAccountId": "123456789012",
+    "eventCategory": "Management",
+    "resources": [{"type": "AWS::S3::Bucket", "ARN": "arn:aws:s3:::aws-sec-ir-test-bucket-abc1234"}]
+  }
+}

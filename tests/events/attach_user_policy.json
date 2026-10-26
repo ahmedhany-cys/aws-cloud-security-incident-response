@@ -1,0 +1,37 @@
+{
+  "version": "0",
+  "id": "11111111-2222-3333-4444-555555555555",
+  "detail-type": "AWS API Call via CloudTrail",
+  "source": "aws.iam",
+  "account": "123456789012",
+  "time": "2026-10-23T10:15:30Z",
+  "region": "us-east-1",
+  "resources": ["arn:aws:events:us-east-1:123456789012:rule/aws-sec-ir-iam-policy-change"],
+  "detail": {
+    "eventVersion": "1.09",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLEPRINCIPAL",
+      "arn": "arn:aws:iam::123456789012:user/aws-sec-ir-deployer",
+      "accountId": "123456789012",
+      "accessKeyId": "AKIAEXAMPLEEXAMPLE1",
+      "userName": "aws-sec-ir-deployer"
+    },
+    "eventTime": "2026-10-23T10:15:28Z",
+    "eventSource": "iam.amazonaws.com",
+    "eventName": "AttachUserPolicy",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "203.0.113.10",
+    "userAgent": "aws-cli/2.36.40 md/awscrt#0.27.0 ua/2.0 os/macos#24.6.0",
+    "requestParameters": {"userName": "aws-sec-ir-test-user", "policyArn": "arn:aws:iam::123456789012:policy/aws-sec-ir/aws-sec-ir-test-policy"},
+    "responseElements": null,
+    "requestID": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+    "eventID": "e1000001-0000-4000-8000-000000000001",
+    "readOnly": false,
+    "eventType": "AwsApiCall",
+    "managementEvent": true,
+    "recipientAccountId": "123456789012",
+    "eventCategory": "Management",
+    "resources": []
+  }
+}

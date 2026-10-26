@@ -1,0 +1,2 @@
+# Runtime dependencies: none. boto3 is provided by the Lambda Python 3.12 runtime.
+# Development/test dependencies live in requirements-dev.txt at the repo root.
