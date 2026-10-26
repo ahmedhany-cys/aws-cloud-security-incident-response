@@ -1,5 +1,17 @@
 # AWS Cloud Security Monitoring and Automated Incident Response
 
+<p align="center">
+  <a href="https://github.com/ahmedhany-cys/aws-cloud-security-incident-response/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/ahmedhany-cys/aws-cloud-security-incident-response/ci.yml?branch=main&style=flat-square&logo=githubactions&logoColor=white&label=CI" alt="CI status" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/ahmedhany-cys/aws-cloud-security-incident-response?style=flat-square&color=2EA043" alt="License: MIT" /></a>
+  <img src="https://img.shields.io/badge/Terraform-%3E%3D%201.5-7B42BC?style=flat-square&logo=terraform&logoColor=white" alt="Terraform >= 1.5" />
+  <img src="https://img.shields.io/badge/AWS%20provider-~%3E%205.0-FF9900?style=flat-square" alt="AWS provider ~> 5.0" />
+  <img src="https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python 3.12" />
+  <img src="https://img.shields.io/badge/tests-pytest-0A9EDC?style=flat-square&logo=pytest&logoColor=white" alt="Tested with pytest" />
+  <img src="https://img.shields.io/badge/lint-ruff-D7FF64?style=flat-square&logo=ruff&logoColor=black" alt="Linted with Ruff" />
+  <a href="https://github.com/ahmedhany-cys/aws-cloud-security-incident-response/commits/main"><img src="https://img.shields.io/github/last-commit/ahmedhany-cys/aws-cloud-security-incident-response?style=flat-square" alt="Last commit" /></a>
+  <img src="https://img.shields.io/badge/cost-%240%2Fmonth%20on%20the%20Free%20Tier-2EA043?style=flat-square" alt="$0/month on the AWS Free Tier" />
+</p>
+
 A portfolio-ready, Terraform-deployed security monitoring pipeline for a single
 AWS account. CloudTrail records management API calls, EventBridge rules match
 suspicious ones, and a Lambda function writes a structured JSON incident report
@@ -24,6 +36,57 @@ A second, independent path covers the case where the trail itself is switched
 off: EventBridge Scheduler runs a health-check Lambda every 5 minutes that calls
 `GetTrailStatus` and writes a CRITICAL incident if the trail is not logging.
 
+<details>
+<summary><b>Rendered architecture diagram</b> (Mermaid, identical to the one in <a href="docs/architecture.md">docs/architecture.md</a>)</summary>
+
+```mermaid
+flowchart LR
+    subgraph Activity["API activity (any principal)"]
+        IAM[IAM API calls<br/>global, logged in us-east-1]
+        S3API[S3 bucket-level API calls]
+        CT_API[CloudTrail API calls]
+    end
+
+    subgraph Detect["Detect"]
+        CT[CloudTrail trail<br/>aws-sec-ir-trail<br/>management events, read+write]
+        AUDIT[(S3 audit-logs bucket<br/>SSE-S3, versioned, 30-day expiry)]
+        EB{{EventBridge default bus}}
+        R1[Rule: iam-policy-change]
+        R2[Rule: logging-tamper]
+        R3[Rule: s3-permission-change]
+    end
+
+    subgraph Respond["Respond"]
+        L[Lambda incident-processor<br/>Python 3.12, 128 MB, 30 s]
+        INC[(S3 incident-reports bucket<br/>incidents/YYYY/MM/DD/eventID.json)]
+        CW[CloudWatch Logs<br/>7-day retention]
+        SNS[SNS email topic<br/>optional, off by default]
+    end
+
+    IAM --> CT
+    S3API --> CT
+    CT_API --> CT
+    CT -->|log files| AUDIT
+    IAM -.->|AWS API Call via CloudTrail| EB
+    S3API -.-> EB
+    CT_API -.-> EB
+    EB --> R1 & R2 & R3
+    R1 & R2 & R3 -->|invoke, scoped by rule ARN| L
+    L -->|PutObject incidents/* only| INC
+    L --> CW
+    L -.->|if enabled| SNS
+
+    subgraph Health["Scheduled trail health check"]
+        SCH[EventBridge Scheduler<br/>rate 5 minutes]
+        HL[Lambda trail-health-check]
+    end
+    SCH -->|invoke via scheduler role| HL
+    HL -->|GetTrailStatus| CT
+    HL -->|CRITICAL TrailNotLogging| INC
+```
+
+</details>
+
 Full diagram and component descriptions: [docs/architecture.md](docs/architecture.md).
 
 ## Detection rules
@@ -42,6 +105,17 @@ operation names. S3 records the `PutPublicAccessBlock` API as
 
 Why these and not others: [docs/design-decisions.md](docs/design-decisions.md).
 Report format: [docs/incident-schema.md](docs/incident-schema.md).
+
+## Tech stack
+
+| Layer | Choice | Why |
+|---|---|---|
+| Infrastructure | Terraform >= 1.5, `hashicorp/aws ~> 5.0`, `hashicorp/archive` | Reproducible from a clean clone; every resource tagged; no hard-coded account IDs |
+| Detection | CloudTrail management events, EventBridge default-bus rules, EventBridge Scheduler | Free for AWS-service events; no log parsing, no agents |
+| Response | AWS Lambda, Python 3.12, boto3 only | No third-party runtime dependencies; least-privilege execution role |
+| Storage | S3 with SSE-S3, versioning, lifecycle expiry, Block Public Access, TLS-only policies | Audit logs and incident reports kept separate and hardened |
+| Testing | pytest (32 unit tests, no AWS access) and a Bash scenario runner with evidence collection and redaction | Detections are proven end to end, not assumed |
+| Quality | GitHub Actions (pytest, Ruff, ShellCheck, `terraform validate`) and Dependabot | Every change is checked; dependencies stay current |
 
 ## Repository layout
 
@@ -109,6 +183,21 @@ AWS_PROFILE=sec-ir scripts/collect_evidence.sh
 Both write redacted outputs to `docs/evidence/`. Scenario definitions and
 results: [docs/test-cases.md](docs/test-cases.md).
 
+## Continuous integration
+
+Every push and pull request runs [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
+without AWS credentials:
+
+| Job | What it checks |
+|---|---|
+| `pytest` | Unit tests on Python 3.12 (the Lambda runtime) and 3.13 |
+| `Ruff` | Lint for `lambda/` and `tests/` ([ruff.toml](ruff.toml)) |
+| `Terraform fmt + validate` | `terraform fmt -check`, `init -backend=false`, `validate` |
+| `ShellCheck` | Static analysis of every script in `scripts/` |
+
+[Dependabot](.github/dependabot.yml) opens weekly pull requests for the
+Terraform providers, the Python dev dependencies and the GitHub Actions.
+
 ## Results summary
 
 Tested on 2026-10-26. Unit tests: 32 passed.
@@ -169,3 +258,14 @@ Empty the versioned buckets, then `terraform destroy`, then confirm no
 - GuardDuty and Security Hub integration when cost is not a constraint.
 - Multi-account: organization trail + EventBridge cross-account bus to a security account.
 - Severity-based routing and a small dashboard built from the incident JSON.
+
+## Contributing
+
+Issues and pull requests are welcome, especially new detection rules. See
+[CONTRIBUTING.md](CONTRIBUTING.md) for the development setup, the four places a
+detection rule touches, and the PR checklist. Security problems go through
+[SECURITY.md](SECURITY.md), not public issues.
+
+## License
+
+[MIT](LICENSE). Copyright (c) 2026 Ahmed Hany.
