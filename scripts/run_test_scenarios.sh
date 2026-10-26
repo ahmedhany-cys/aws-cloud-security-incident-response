@@ -6,6 +6,7 @@
 #   scripts/run_test_scenarios.sh T1 T3      # a subset
 # Env: AWS_PROFILE (default sec-ir), INCIDENT_TIMEOUT (s, default 900),
 #      NEGATIVE_WINDOW (s, default 300)
+# shellcheck source=scripts/common.sh
 source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 load_outputs
 
