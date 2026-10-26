@@ -1,0 +1,45 @@
+name: Detection rule request
+description: Propose a new suspicious API call or category to detect
+title: "[Detection]: "
+labels: [enhancement, detection]
+body:
+  - type: input
+    id: event-names
+    attributes:
+      label: CloudTrail event name(s)
+      description: The exact names as CloudTrail records them (not always the API operation name).
+      placeholder: "CreateAccessKey, CreateLoginProfile"
+    validations:
+      required: true
+  - type: input
+    id: event-source
+    attributes:
+      label: Event source
+      placeholder: "iam.amazonaws.com"
+    validations:
+      required: true
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Proposed severity
+      options: [CRITICAL, HIGH, MEDIUM, LOW]
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it matters
+      description: What attacker technique or misconfiguration does this catch? Link to MITRE ATT&CK or AWS docs if helpful.
+    validations:
+      required: true
+  - type: textarea
+    id: actions
+    attributes:
+      label: Recommended response actions
+      description: What should the incident report tell a responder to do?
+  - type: checkboxes
+    id: free-tier
+    attributes:
+      label: Cost check
+      options:
+        - label: This rule only matches management events on the default EventBridge bus (free), so it keeps the project at $0/month.
