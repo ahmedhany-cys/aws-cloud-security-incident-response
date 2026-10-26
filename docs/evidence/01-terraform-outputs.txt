@@ -1,4 +1,4 @@
-# $ terraform -chdir=/Users/ahmedhany/aws project (1)/terraform output
+# $ terraform -chdir=<project-root>/terraform output
 # 2026-10-26T07:09:23Z
 audit_bucket = "aws-sec-ir-audit-logs-ahr4827"
 detection_rule_names = [
