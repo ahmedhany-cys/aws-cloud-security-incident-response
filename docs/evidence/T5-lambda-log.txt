@@ -1,0 +1,4 @@
+# $ lambda_logs 7e65c18c-8105-4eae-8f94-bddc42c6a81f 1792994537
+# 2026-10-26T06:02:54Z
+{"level": "INFO", "logger": "incident_processor", "message": "incident_written", "request_id": "04e4a07f-b62f-4af6-a0c3-ae765ef18b51", "incident_id": "inc-7e65c18c-8105-4eae-8f94-bddc42c6a81f", "event_name": "DeleteBucketPublicAccessBlock", "severity": "HIGH", "category": "s3_permission_change", "actor": "arn:aws:iam::123456789012:user/aws-sec-ir-deployer", "s3_key": "incidents/2026/10/26/7e65c18c-8105-4eae-8f94-bddc42c6a81f.json", "raw_event_id": "7e65c18c-8105-4eae-8f94-bddc42c6a81f"}
+

@@ -1,0 +1,10 @@
+# $ aws events list-targets-by-rule --rule aws-sec-ir-logging-tamper
+# 2026-10-26T06:18:33Z
+{
+    "Targets": [
+        {
+            "Id": "incident-processor",
+            "Arn": "arn:aws:lambda:us-east-1:123456789012:function:aws-sec-ir-incident-processor"
+        }
+    ]
+}

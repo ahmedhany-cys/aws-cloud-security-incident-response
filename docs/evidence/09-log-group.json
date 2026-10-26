@@ -1,0 +1,18 @@
+# $ aws logs describe-log-groups --log-group-name-prefix /aws/lambda/aws-sec-ir-incident-processor
+# 2026-10-26T06:18:39Z
+{
+    "logGroups": [
+        {
+            "logGroupName": "/aws/lambda/aws-sec-ir-incident-processor",
+            "creationTime": 1234567890122,
+            "retentionInDays": 7,
+            "metricFilterCount": 0,
+            "arn": "arn:aws:logs:us-east-1:123456789012:log-group:/aws/lambda/aws-sec-ir-incident-processor:*",
+            "storedBytes": 0,
+            "logGroupClass": "STANDARD",
+            "logGroupArn": "arn:aws:logs:us-east-1:123456789012:log-group:/aws/lambda/aws-sec-ir-incident-processor",
+            "deletionProtectionEnabled": false,
+            "bearerTokenAuthenticationEnabled": false
+        }
+    ]
+}

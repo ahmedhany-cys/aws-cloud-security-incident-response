@@ -1,0 +1,10 @@
+scenario	attempt	event	result	detail
+T1	run2	AttachUserPolicy	PASS	incidents/2026/10/26/f0e8549c-8467-4a4c-b6d8-545deea2b605.json
+T2	run2	PutUserPolicy	PASS	incidents/2026/10/26/0791a506-7a09-4bc5-ac42-093a2645a5cd.json
+T3	run1	StopLogging	PASS	incidents/2026/10/26/7cc930bf-6836-45dd-8733-d28c21c83422.json (evidence in run1/)
+T3	run2	StopLogging	FAIL	no incident within 900s; event in CloudTrail history but not delivered to EventBridge (evidence in run2-T3/)
+T3	run3	StopLogging	PASS	incidents/2026/10/26/ee953bca-6dc3-4501-b823-c1307ca48323.json
+T4	run2	PutBucketPolicy	PASS	incidents/2026/10/26/736436a3-11ad-4b1c-9aa5-7137d4326ea9.json
+T5	run1	DeletePublicAccessBlock	FAIL	wrong event name in rule; fixed (evidence in run1/T5-attempt1-diagnosis.txt)
+T5	run2	DeleteBucketPublicAccessBlock	PASS	incidents/2026/10/26/7e65c18c-8105-4eae-8f94-bddc42c6a81f.json
+T6	run2	ListUsers/ListBuckets	PASS	no incident within 300s

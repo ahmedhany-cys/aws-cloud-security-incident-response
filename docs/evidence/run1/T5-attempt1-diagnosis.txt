@@ -1,0 +1,26 @@
+# T5 attempt 1 (2026-10-26): no incident within ~70 s, unlike T1-T4 (2-3 s).
+# Diagnosis: CloudTrail event names for the bucket-level public access block differ from the API names.
+# $ aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=DeletePublicAccessBlock --start-time 2026-10-26T05:00:00Z
+[]
+# $ aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=PutPublicAccessBlock --start-time 2026-10-26T05:00:00Z
+[]
+# $ aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=DeleteBucketPublicAccessBlock --start-time 2026-10-26T05:00:00Z
+[]
+# $ aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=PutBucketPublicAccessBlock --start-time 2026-10-26T05:00:00Z
+[
+    {
+        "EventName": "PutBucketPublicAccessBlock",
+        "EventTime": "2026-10-26T09:25:58+04:00",
+        "Username": "aws-sec-ir-deployer"
+    },
+    {
+        "EventName": "PutBucketPublicAccessBlock",
+        "EventTime": "2026-10-26T09:25:57+04:00",
+        "Username": "aws-sec-ir-deployer"
+    },
+    {
+        "EventName": "PutBucketPublicAccessBlock",
+        "EventTime": "2026-10-26T09:25:57+04:00",
+        "Username": "aws-sec-ir-deployer"
+    }
+]

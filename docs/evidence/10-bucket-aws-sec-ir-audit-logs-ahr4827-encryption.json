@@ -1,0 +1,19 @@
+# $ aws s3api get-bucket-encryption --bucket aws-sec-ir-audit-logs-ahr4827
+# 2026-10-26T06:18:42Z
+{
+    "ServerSideEncryptionConfiguration": {
+        "Rules": [
+            {
+                "ApplyServerSideEncryptionByDefault": {
+                    "SSEAlgorithm": "AES256"
+                },
+                "BucketKeyEnabled": false,
+                "BlockedEncryptionTypes": {
+                    "EncryptionType": [
+                        "SSE-C"
+                    ]
+                }
+            }
+        ]
+    }
+}

@@ -1,0 +1,14 @@
+# $ aws resourcegroupstaggingapi get-resources --tag-filters Key=Project,Values=aws-sec-ir --query ResourceTagMappingList[].ResourceARN
+# 2026-10-26T06:18:58Z
+[
+    "arn:aws:cloudtrail:us-east-1:123456789012:trail/aws-sec-ir-trail",
+    "arn:aws:logs:us-east-1:123456789012:log-group:/aws/lambda/aws-sec-ir-incident-processor",
+    "arn:aws:s3:::aws-sec-ir-audit-logs-ahr4827",
+    "arn:aws:iam::123456789012:policy/aws-sec-ir/aws-sec-ir-test-policy",
+    "arn:aws:lambda:us-east-1:123456789012:function:aws-sec-ir-incident-processor",
+    "arn:aws:s3:::aws-sec-ir-incident-reports-ahr4827",
+    "arn:aws:events:us-east-1:123456789012:rule/aws-sec-ir-logging-tamper",
+    "arn:aws:s3:::aws-sec-ir-test-bucket-ahr4827",
+    "arn:aws:events:us-east-1:123456789012:rule/aws-sec-ir-iam-policy-change",
+    "arn:aws:events:us-east-1:123456789012:rule/aws-sec-ir-s3-permission-change"
+]

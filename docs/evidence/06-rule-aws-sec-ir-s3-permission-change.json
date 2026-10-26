@@ -1,0 +1,11 @@
+# $ aws events describe-rule --name aws-sec-ir-s3-permission-change
+# 2026-10-26T06:18:34Z
+{
+    "Name": "aws-sec-ir-s3-permission-change",
+    "Arn": "arn:aws:events:us-east-1:123456789012:rule/aws-sec-ir-s3-permission-change",
+    "EventPattern": "{\"detail\":{\"eventName\":[\"PutBucketPolicy\",\"DeleteBucketPolicy\",\"PutBucketAcl\",\"PutBucketPublicAccessBlock\",\"DeleteBucketPublicAccessBlock\",\"PutAccountPublicAccessBlock\",\"DeleteAccountPublicAccessBlock\"],\"eventSource\":[\"s3.amazonaws.com\"]},\"detail-type\":[\"AWS API Call via CloudTrail\"],\"source\":[\"aws.s3\"]}",
+    "State": "ENABLED",
+    "Description": "S3 bucket policy, ACL or public access block changed (data exposure path)",
+    "EventBusName": "default",
+    "CreatedBy": "123456789012"
+}

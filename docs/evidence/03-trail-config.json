@@ -1,0 +1,16 @@
+# $ aws cloudtrail get-trail --name aws-sec-ir-trail
+# 2026-10-26T06:18:24Z
+{
+    "Trail": {
+        "Name": "aws-sec-ir-trail",
+        "S3BucketName": "aws-sec-ir-audit-logs-ahr4827",
+        "IncludeGlobalServiceEvents": true,
+        "IsMultiRegionTrail": false,
+        "HomeRegion": "us-east-1",
+        "TrailARN": "arn:aws:cloudtrail:us-east-1:123456789012:trail/aws-sec-ir-trail",
+        "LogFileValidationEnabled": true,
+        "HasCustomEventSelectors": false,
+        "HasInsightSelectors": false,
+        "IsOrganizationTrail": false
+    }
+}

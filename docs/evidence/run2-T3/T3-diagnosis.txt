@@ -1,0 +1,25 @@
+# T3 attempt 2 (run 2, 2026-10-26): stop-logging 05:45:44Z, start-logging 05:45:45Z, no incident within 900 s.
+# 1) CloudTrail Event history DID record both StopLogging calls (attempt 1 at 05:33:18Z, attempt 2 at 05:45:45Z):
+# $ aws cloudtrail lookup-events --lookup-attributes AttributeKey=EventName,AttributeValue=StopLogging --start-time 2026-10-26T05:30:00Z --end-time 2026-10-26T06:00:00Z
+[
+    {
+        "EventName": "StopLogging",
+        "EventTime": "2026-10-26T09:45:45+04:00",
+        "Username": "aws-sec-ir-deployer",
+        "EventId": "7e51a513-1165-499e-be2a-52341d22546f"
+    },
+    {
+        "EventName": "StopLogging",
+        "EventTime": "2026-10-26T09:33:18+04:00",
+        "Username": "aws-sec-ir-deployer",
+        "EventId": "7cc930bf-6836-45dd-8733-d28c21c83422"
+    }
+]
+# 2) The Lambda was not invoked at all between 05:45:00Z and 06:00:00Z (EventBridge delivered nothing):
+# $ aws logs filter-log-events --log-group-name /aws/lambda/aws-sec-ir-incident-processor --start-time <05:45Z> --end-time <06:00Z>
+0
+# 3) AWS EventBridge user guide: 'To record events with one of the CloudTrail detail-type values, you must enable a CloudTrail trail with logging.' StopLogging disables the only trail, so delivery of that same event is a race.
+# 4) Trail confirmed logging again after the restore:
+{
+    "IsLogging": true
+}

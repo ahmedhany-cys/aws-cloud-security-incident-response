@@ -1,0 +1,6 @@
+scenario	event	result	detail
+T1	AttachUserPolicy	PASS	incidents/2026/10/26/55b2183d-511e-4706-aa5b-37d900bc1f81.json
+T2	PutUserPolicy	PASS	incidents/2026/10/26/3972229c-bea1-4036-b285-62da3e1025ed.json
+T3	StopLogging	PASS	incidents/2026/10/26/7cc930bf-6836-45dd-8733-d28c21c83422.json
+T4	PutBucketPolicy	PASS	incidents/2026/10/26/cd9c1dd9-e2bb-4f18-966e-e7dd36eeb320.json
+T5	DeletePublicAccessBlock	FAIL (attempt 1)	no incident: rule matched API names, CloudTrail logs DeleteBucketPublicAccessBlock

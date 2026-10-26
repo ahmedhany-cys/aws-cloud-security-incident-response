@@ -1,0 +1,5 @@
+# $ aws s3api get-bucket-policy --bucket aws-sec-ir-test-bucket-ahr4827
+# 2026-10-26T06:01:11Z
+{
+    "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"DenyInsecureTransport\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"s3:*\",\"Resource\":[\"arn:aws:s3:::aws-sec-ir-test-bucket-ahr4827/*\",\"arn:aws:s3:::aws-sec-ir-test-bucket-ahr4827\"],\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}}}]}"
+}

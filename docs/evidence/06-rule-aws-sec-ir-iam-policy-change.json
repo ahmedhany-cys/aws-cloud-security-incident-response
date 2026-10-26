@@ -1,0 +1,11 @@
+# $ aws events describe-rule --name aws-sec-ir-iam-policy-change
+# 2026-10-26T06:18:29Z
+{
+    "Name": "aws-sec-ir-iam-policy-change",
+    "Arn": "arn:aws:events:us-east-1:123456789012:rule/aws-sec-ir-iam-policy-change",
+    "EventPattern": "{\"detail\":{\"eventName\":[\"AttachUserPolicy\",\"AttachRolePolicy\",\"AttachGroupPolicy\",\"PutUserPolicy\",\"PutRolePolicy\",\"PutGroupPolicy\",\"CreatePolicy\",\"CreatePolicyVersion\",\"SetDefaultPolicyVersion\"],\"eventSource\":[\"iam.amazonaws.com\"]},\"detail-type\":[\"AWS API Call via CloudTrail\"],\"source\":[\"aws.iam\"]}",
+    "State": "ENABLED",
+    "Description": "IAM policy attached, created or inlined (privilege escalation path)",
+    "EventBusName": "default",
+    "CreatedBy": "123456789012"
+}

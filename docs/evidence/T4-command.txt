@@ -1,0 +1,2 @@
+# $ aws s3api put-bucket-policy --bucket aws-sec-ir-test-bucket-ahr4827 --policy {"Version":"2012-10-17","Statement":[{"Sid":"AwsSecIrTestMarker","Effect":"Deny","Principal":"*","Action":"s3:*","Resource":["arn:aws:s3:::aws-sec-ir-test-bucket-ahr4827","arn:aws:s3:::aws-sec-ir-test-bucket-ahr4827/*"],"Condition":{"Bool":{"aws:SecureTransport":"false"}}}]}
+# 2026-10-26T06:01:05Z

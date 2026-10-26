@@ -1,0 +1,4 @@
+# $ lambda_logs ee953bca-6dc3-4501-b823-c1307ca48323 1792995372
+# 2026-10-26T06:16:43Z
+{"level": "INFO", "logger": "incident_processor", "message": "incident_written", "request_id": "01e49ce0-1ae0-4b5b-84d5-3ed32f928fd8", "incident_id": "inc-ee953bca-6dc3-4501-b823-c1307ca48323", "event_name": "StopLogging", "severity": "CRITICAL", "category": "logging_tamper", "actor": "arn:aws:iam::123456789012:user/aws-sec-ir-deployer", "s3_key": "incidents/2026/10/26/ee953bca-6dc3-4501-b823-c1307ca48323.json", "raw_event_id": "ee953bca-6dc3-4501-b823-c1307ca48323"}
+

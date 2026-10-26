@@ -1,0 +1,44 @@
+# $ aws s3 cp s3://aws-sec-ir-incident-reports-ahr4827/incidents/2026/10/26/55b2183d-511e-4706-aa5b-37d900bc1f81.json -
+# 2026-10-26T05:28:51Z
+{
+  "actor": {
+    "arn": "arn:aws:iam::123456789012:user/aws-sec-ir-deployer",
+    "type": "IAMUser",
+    "user_name": "aws-sec-ir-deployer"
+  },
+  "aws_region": "us-east-1",
+  "category": "iam_policy_change",
+  "detected_at": "2026-10-26T05:28:24Z",
+  "error_code": null,
+  "error_message": null,
+  "event_name": "AttachUserPolicy",
+  "event_source": "iam.amazonaws.com",
+  "event_time": "2026-10-26T05:28:22Z",
+  "eventbridge_rule": null,
+  "incident_id": "inc-55b2183d-511e-4706-aa5b-37d900bc1f81",
+  "raw_event_id": "55b2183d-511e-4706-aa5b-37d900bc1f81",
+  "recommended_actions": [
+    "Confirm the change was authorised (ticket / change record).",
+    "Review the policy document for wildcard (*) actions or resources.",
+    "If unauthorised: detach/delete the policy, then rotate the actor's credentials.",
+    "Check CloudTrail for other activity by the same principal in the last 24 h."
+  ],
+  "request_parameters": {
+    "policyArn": "arn:aws:iam::123456789012:policy/aws-sec-ir/aws-sec-ir-test-policy",
+    "userName": "aws-sec-ir-test-user"
+  },
+  "resources": [
+    {
+      "identifier": "aws-sec-ir-test-user",
+      "type": "AWS::IAM::User"
+    },
+    {
+      "identifier": "arn:aws:iam::123456789012:policy/aws-sec-ir/aws-sec-ir-test-policy",
+      "type": "AWS::IAM::Policy"
+    }
+  ],
+  "schema_version": "1.0",
+  "severity": "HIGH",
+  "source_ip": "203.0.113.10",
+  "user_agent": "aws-cli/2.36.40 md/awscrt#0.36.2 ua/2.1 os/macos#24.6.0 md/arch#arm64 lang/python#3.14.7 md/pyimpl#CPython m/AN,n,b,E,Z cfg/retry-mode#standard md/installer#source sid/07890b72dcc3 md/prompt#off md/command#iam.attach-user-policy"
+}

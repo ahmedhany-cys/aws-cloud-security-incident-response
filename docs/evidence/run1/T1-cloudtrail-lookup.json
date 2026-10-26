@@ -1,0 +1,24 @@
+{
+    "Events": [
+        {
+            "EventId": "55b2183d-511e-4706-aa5b-37d900bc1f81",
+            "EventName": "AttachUserPolicy",
+            "ReadOnly": "false",
+            "AccessKeyId": "AKIA_REDACTED",
+            "EventTime": "2026-10-26T09:28:22+04:00",
+            "EventSource": "iam.amazonaws.com",
+            "Username": "aws-sec-ir-deployer",
+            "Resources": [
+                {
+                    "ResourceType": "AWS::IAM::User",
+                    "ResourceName": "aws-sec-ir-test-user"
+                },
+                {
+                    "ResourceType": "AWS::IAM::Policy",
+                    "ResourceName": "arn:aws:iam::123456789012:policy/aws-sec-ir/aws-sec-ir-test-policy"
+                }
+            ],
+            "CloudTrailEvent": "{\"eventVersion\":\"1.11\",\"userIdentity\":{\"type\":\"IAMUser\",\"principalId\":\"AIDA_REDACTED\",\"arn\":\"arn:aws:iam::123456789012:user/aws-sec-ir-deployer\",\"accountId\":\"123456789012\",\"accessKeyId\":\"AKIA_REDACTED\",\"userName\":\"aws-sec-ir-deployer\"},\"eventTime\":\"2026-10-26T05:28:22Z\",\"eventSource\":\"iam.amazonaws.com\",\"eventName\":\"AttachUserPolicy\",\"awsRegion\":\"us-east-1\",\"sourceIPAddress\":\"203.0.113.10\",\"userAgent\":\"aws-cli/2.36.40 md/awscrt#0.36.2 ua/2.1 os/macos#24.6.0 md/arch#arm64 lang/python#3.14.7 md/pyimpl#CPython m/AN,n,b,E,Z cfg/retry-mode#standard md/installer#source sid/07890b72dcc3 md/prompt#off md/command#iam.attach-user-policy\",\"requestParameters\":{\"userName\":\"aws-sec-ir-test-user\",\"policyArn\":\"arn:aws:iam::123456789012:policy/aws-sec-ir/aws-sec-ir-test-policy\"},\"responseElements\":null,\"requestID\":\"c16209c4-88aa-46e5-894e-c5549471bbff\",\"eventID\":\"55b2183d-511e-4706-aa5b-37d900bc1f81\",\"readOnly\":false,\"eventType\":\"AwsApiCall\",\"managementEvent\":true,\"recipientAccountId\":\"123456789012\",\"eventCategory\":\"Management\",\"tlsDetails\":{\"tlsVersion\":\"TLSv1.3\",\"cipherSuite\":\"TLS_AES_128_GCM_SHA256\",\"clientProvidedHostHeader\":\"iam.amazonaws.com\"}}"
+        }
+    ]
+}

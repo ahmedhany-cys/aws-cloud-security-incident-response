@@ -1,0 +1,7 @@
+# $ aws sts get-caller-identity
+# 2026-10-26T06:18:21Z
+{
+    "UserId": "AIDA_REDACTED",
+    "Account": "123456789012",
+    "Arn": "arn:aws:iam::123456789012:user/aws-sec-ir-deployer"
+}

@@ -1,0 +1,4 @@
+# $ lambda_logs 736436a3-11ad-4b1c-9aa5-7137d4326ea9 1792994463
+# 2026-10-26T06:01:42Z
+{"level": "INFO", "logger": "incident_processor", "message": "incident_written", "request_id": "2b932297-bc25-4049-b4cf-6f2aa4cb43ea", "incident_id": "inc-736436a3-11ad-4b1c-9aa5-7137d4326ea9", "event_name": "PutBucketPolicy", "severity": "HIGH", "category": "s3_permission_change", "actor": "arn:aws:iam::123456789012:user/aws-sec-ir-deployer", "s3_key": "incidents/2026/10/26/736436a3-11ad-4b1c-9aa5-7137d4326ea9.json", "raw_event_id": "736436a3-11ad-4b1c-9aa5-7137d4326ea9"}
+

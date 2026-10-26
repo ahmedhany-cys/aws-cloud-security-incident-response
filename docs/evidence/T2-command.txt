@@ -1,0 +1,2 @@
+# $ aws iam put-user-policy --user-name aws-sec-ir-test-user --policy-name aws-sec-ir-t2-inline --policy-document {"Version":"2012-10-17","Statement":[{"Effect":"Allow","Action":"sts:GetCallerIdentity","Resource":"*"}]}
+# 2026-10-26T05:42:57Z

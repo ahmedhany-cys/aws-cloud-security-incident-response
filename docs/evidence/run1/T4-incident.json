@@ -1,0 +1,65 @@
+# $ aws s3 cp s3://aws-sec-ir-incident-reports-ahr4827/incidents/2026/10/26/cd9c1dd9-e2bb-4f18-966e-e7dd36eeb320.json -
+# 2026-10-26T05:36:14Z
+{
+  "actor": {
+    "arn": "arn:aws:iam::123456789012:user/aws-sec-ir-deployer",
+    "type": "IAMUser",
+    "user_name": "aws-sec-ir-deployer"
+  },
+  "aws_region": "us-east-1",
+  "category": "s3_permission_change",
+  "detected_at": "2026-10-26T05:36:10Z",
+  "error_code": null,
+  "error_message": null,
+  "event_name": "PutBucketPolicy",
+  "event_source": "s3.amazonaws.com",
+  "event_time": "2026-10-26T05:36:05Z",
+  "eventbridge_rule": null,
+  "incident_id": "inc-cd9c1dd9-e2bb-4f18-966e-e7dd36eeb320",
+  "raw_event_id": "cd9c1dd9-e2bb-4f18-966e-e7dd36eeb320",
+  "recommended_actions": [
+    "Run aws s3api get-bucket-policy-status to check whether the bucket is now public.",
+    "Restore the previous bucket policy / public access block from version control.",
+    "Check S3 server access logs or CloudTrail data events (if enabled) for unexpected reads.",
+    "Confirm the actor was authorised to change bucket permissions."
+  ],
+  "request_parameters": {
+    "Host": "aws-sec-ir-test-bucket-ahr4827.s3.us-east-1.amazonaws.com",
+    "bucketName": "aws-sec-ir-test-bucket-ahr4827",
+    "bucketPolicy": {
+      "Statement": [
+        {
+          "Action": "s3:*",
+          "Condition": {
+            "Bool": {
+              "aws:SecureTransport": "false"
+            }
+          },
+          "Effect": "Deny",
+          "Principal": "*",
+          "Resource": [
+            "arn:aws:s3:::aws-sec-ir-test-bucket-ahr4827",
+            "arn:aws:s3:::aws-sec-ir-test-bucket-ahr4827/*"
+          ],
+          "Sid": "AwsSecIrTestMarker"
+        }
+      ],
+      "Version": "2012-10-17"
+    },
+    "policy": ""
+  },
+  "resources": [
+    {
+      "identifier": "arn:aws:s3:::aws-sec-ir-test-bucket-ahr4827",
+      "type": "AWS::S3::Bucket"
+    },
+    {
+      "identifier": "aws-sec-ir-test-bucket-ahr4827",
+      "type": "AWS::S3::Bucket"
+    }
+  ],
+  "schema_version": "1.0",
+  "severity": "HIGH",
+  "source_ip": "203.0.113.10",
+  "user_agent": "[aws-cli/2.36.40 md/awscrt#0.36.2 ua/2.1 os/macos#24.6.0 md/arch#arm64 lang/python#3.14.7 md/pyimpl#CPython m/n,Z,W,b,E,AN cfg/retry-mode#standard md/installer#source sid/07890b72dcc3 md/prompt#off md/command#s3api.put-bucket-policy]"
+}

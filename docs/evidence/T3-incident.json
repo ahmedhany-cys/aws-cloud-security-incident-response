@@ -1,0 +1,38 @@
+# $ aws s3 cp s3://aws-sec-ir-incident-reports-ahr4827/incidents/2026/10/26/ee953bca-6dc3-4501-b823-c1307ca48323.json -
+# 2026-10-26T06:16:42Z
+{
+  "actor": {
+    "arn": "arn:aws:iam::123456789012:user/aws-sec-ir-deployer",
+    "type": "IAMUser",
+    "user_name": "aws-sec-ir-deployer"
+  },
+  "aws_region": "us-east-1",
+  "category": "logging_tamper",
+  "detected_at": "2026-10-26T06:16:16Z",
+  "error_code": null,
+  "error_message": null,
+  "event_name": "StopLogging",
+  "event_source": "cloudtrail.amazonaws.com",
+  "event_time": "2026-10-26T06:16:13Z",
+  "incident_id": "inc-ee953bca-6dc3-4501-b823-c1307ca48323",
+  "raw_event_id": "ee953bca-6dc3-4501-b823-c1307ca48323",
+  "recommended_actions": [
+    "Re-enable logging immediately: aws cloudtrail start-logging --name <trail>.",
+    "Verify trail status with get-trail-status and compare event selectors to the baseline.",
+    "Treat as possible defense evasion: review all API activity by the actor since the event.",
+    "Consider an SCP or IAM deny on cloudtrail:StopLogging / DeleteTrail for non-admins."
+  ],
+  "request_parameters": {
+    "name": "aws-sec-ir-trail"
+  },
+  "resources": [
+    {
+      "identifier": "aws-sec-ir-trail",
+      "type": "AWS::CloudTrail::Trail"
+    }
+  ],
+  "schema_version": "1.0",
+  "severity": "CRITICAL",
+  "source_ip": "203.0.113.10",
+  "user_agent": "aws-cli/2.36.40 md/awscrt#0.36.2 ua/2.1 os/macos#24.6.0 md/arch#arm64 lang/python#3.14.7 md/pyimpl#CPython m/n,AN,b,Z,E cfg/retry-mode#standard md/installer#source sid/07890b72dcc3 md/prompt#off md/command#cloudtrail.stop-logging"
+}

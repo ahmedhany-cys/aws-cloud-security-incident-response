@@ -1,0 +1,2 @@
+# $ aws iam attach-user-policy --user-name aws-sec-ir-test-user --policy-arn arn:aws:iam::123456789012:policy/aws-sec-ir/aws-sec-ir-test-policy
+# 2026-10-26T05:28:21Z

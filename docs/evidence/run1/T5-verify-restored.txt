@@ -1,0 +1,10 @@
+# $ aws s3api get-public-access-block --bucket aws-sec-ir-test-bucket-ahr4827
+# 2026-10-26T05:37:55Z
+{
+    "PublicAccessBlockConfiguration": {
+        "BlockPublicAcls": true,
+        "IgnorePublicAcls": true,
+        "BlockPublicPolicy": true,
+        "RestrictPublicBuckets": true
+    }
+}

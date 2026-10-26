@@ -1,0 +1,24 @@
+aws_cloudwatch_event_rule.detection["s3-permission-change"]: Modifying... [id=aws-sec-ir-s3-permission-change]
+aws_lambda_function.incident_processor: Modifying... [id=aws-sec-ir-incident-processor]
+aws_cloudwatch_event_rule.detection["s3-permission-change"]: Modifications complete after 1s [id=aws-sec-ir-s3-permission-change]
+aws_lambda_function.incident_processor: Modifications complete after 7s [id=aws-sec-ir-incident-processor]
+
+Apply complete! Resources: 0 added, 2 changed, 0 destroyed.
+
+Outputs:
+
+audit_bucket = "aws-sec-ir-audit-logs-ahr4827"
+detection_rule_names = [
+  "aws-sec-ir-iam-policy-change",
+  "aws-sec-ir-logging-tamper",
+  "aws-sec-ir-s3-permission-change",
+]
+incident_bucket = "aws-sec-ir-incident-reports-ahr4827"
+lambda_function_name = "aws-sec-ir-incident-processor"
+lambda_log_group = "/aws/lambda/aws-sec-ir-incident-processor"
+region = "us-east-1"
+test_bucket = "aws-sec-ir-test-bucket-ahr4827"
+test_policy_arn = "arn:aws:iam::123456789012:policy/aws-sec-ir/aws-sec-ir-test-policy"
+test_user_name = "aws-sec-ir-test-user"
+trail_arn = "arn:aws:cloudtrail:us-east-1:123456789012:trail/aws-sec-ir-trail"
+trail_name = "aws-sec-ir-trail"

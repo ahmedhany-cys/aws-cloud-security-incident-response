@@ -1,0 +1,2 @@
+# $ aws cloudtrail stop-logging --name aws-sec-ir-trail
+# 2026-10-26T05:33:17Z

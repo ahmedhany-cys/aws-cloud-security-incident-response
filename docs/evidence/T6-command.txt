@@ -1,0 +1,43 @@
+# $ aws iam list-users --max-items 5
+# 2026-10-26T06:04:31Z
+{
+    "Users": [
+        {
+            "Path": "/",
+            "UserName": "Ahmed",
+            "UserId": "AIDA_REDACTED",
+            "Arn": "arn:aws:iam::123456789012:user/Ahmed",
+            "CreateDate": "2026-05-31T09:59:36+00:00",
+            "PasswordLastUsed": "2026-10-26T04:35:15+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "aws-sec-ir-deployer",
+            "UserId": "AIDA_REDACTED",
+            "Arn": "arn:aws:iam::123456789012:user/aws-sec-ir-deployer",
+            "CreateDate": "2026-10-26T04:48:51+00:00"
+        },
+        {
+            "Path": "/aws-sec-ir/",
+            "UserName": "aws-sec-ir-test-user",
+            "UserId": "AIDA_REDACTED",
+            "Arn": "arn:aws:iam::123456789012:user/aws-sec-ir/aws-sec-ir-test-user",
+            "CreateDate": "2026-10-26T05:25:52+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "Siem_project",
+            "UserId": "AIDA_REDACTED",
+            "Arn": "arn:aws:iam::123456789012:user/Siem_project",
+            "CreateDate": "2026-09-05T11:03:46+00:00",
+            "PasswordLastUsed": "2026-09-05T11:15:42+00:00"
+        },
+        {
+            "Path": "/",
+            "UserName": "siem_project_attacker",
+            "UserId": "AIDA_REDACTED",
+            "Arn": "arn:aws:iam::123456789012:user/siem_project_attacker",
+            "CreateDate": "2026-09-05T14:51:23+00:00"
+        }
+    ]
+}

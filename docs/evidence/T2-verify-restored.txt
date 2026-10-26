@@ -1,0 +1,5 @@
+# $ aws iam list-user-policies --user-name aws-sec-ir-test-user
+# 2026-10-26T05:43:01Z
+{
+    "PolicyNames": []
+}

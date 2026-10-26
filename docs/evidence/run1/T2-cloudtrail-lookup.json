@@ -1,0 +1,24 @@
+{
+    "Events": [
+        {
+            "EventId": "3972229c-bea1-4036-b285-62da3e1025ed",
+            "EventName": "PutUserPolicy",
+            "ReadOnly": "false",
+            "AccessKeyId": "AKIA_REDACTED",
+            "EventTime": "2026-10-26T09:31:02+04:00",
+            "EventSource": "iam.amazonaws.com",
+            "Username": "aws-sec-ir-deployer",
+            "Resources": [
+                {
+                    "ResourceType": "AWS::IAM::User",
+                    "ResourceName": "aws-sec-ir-test-user"
+                },
+                {
+                    "ResourceType": "AWS::IAM::Policy",
+                    "ResourceName": "aws-sec-ir-t2-inline"
+                }
+            ],
+            "CloudTrailEvent": "{\"eventVersion\":\"1.11\",\"userIdentity\":{\"type\":\"IAMUser\",\"principalId\":\"AIDA_REDACTED\",\"arn\":\"arn:aws:iam::123456789012:user/aws-sec-ir-deployer\",\"accountId\":\"123456789012\",\"accessKeyId\":\"AKIA_REDACTED\",\"userName\":\"aws-sec-ir-deployer\"},\"eventTime\":\"2026-10-26T05:31:02Z\",\"eventSource\":\"iam.amazonaws.com\",\"eventName\":\"PutUserPolicy\",\"awsRegion\":\"us-east-1\",\"sourceIPAddress\":\"203.0.113.10\",\"userAgent\":\"aws-cli/2.36.40 md/awscrt#0.36.2 ua/2.1 os/macos#24.6.0 md/arch#arm64 lang/python#3.14.7 md/pyimpl#CPython m/n,Z,E,AN,b cfg/retry-mode#standard md/installer#source sid/07890b72dcc3 md/prompt#off md/command#iam.put-user-policy\",\"requestParameters\":{\"userName\":\"aws-sec-ir-test-user\",\"policyName\":\"aws-sec-ir-t2-inline\",\"policyDocument\":\"{\\\"Version\\\":\\\"2012-10-17\\\",\\\"Statement\\\":[{\\\"Effect\\\":\\\"Allow\\\",\\\"Action\\\":\\\"sts:GetCallerIdentity\\\",\\\"Resource\\\":\\\"*\\\"}]}\"},\"responseElements\":null,\"requestID\":\"0041fd38-0109-4ce7-9e22-8d6d60a5a57f\",\"eventID\":\"3972229c-bea1-4036-b285-62da3e1025ed\",\"readOnly\":false,\"eventType\":\"AwsApiCall\",\"managementEvent\":true,\"recipientAccountId\":\"123456789012\",\"eventCategory\":\"Management\",\"tlsDetails\":{\"tlsVersion\":\"TLSv1.3\",\"cipherSuite\":\"TLS_AES_128_GCM_SHA256\",\"clientProvidedHostHeader\":\"iam.amazonaws.com\"}}"
+        }
+    ]
+}

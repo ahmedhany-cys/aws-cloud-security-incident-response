@@ -1,0 +1,30 @@
+# $ aws events list-rules --name-prefix aws-sec-ir-
+# 2026-10-26T06:18:27Z
+{
+    "Rules": [
+        {
+            "Name": "aws-sec-ir-iam-policy-change",
+            "Arn": "arn:aws:events:us-east-1:123456789012:rule/aws-sec-ir-iam-policy-change",
+            "EventPattern": "{\"detail\":{\"eventName\":[\"AttachUserPolicy\",\"AttachRolePolicy\",\"AttachGroupPolicy\",\"PutUserPolicy\",\"PutRolePolicy\",\"PutGroupPolicy\",\"CreatePolicy\",\"CreatePolicyVersion\",\"SetDefaultPolicyVersion\"],\"eventSource\":[\"iam.amazonaws.com\"]},\"detail-type\":[\"AWS API Call via CloudTrail\"],\"source\":[\"aws.iam\"]}",
+            "State": "ENABLED",
+            "Description": "IAM policy attached, created or inlined (privilege escalation path)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "aws-sec-ir-logging-tamper",
+            "Arn": "arn:aws:events:us-east-1:123456789012:rule/aws-sec-ir-logging-tamper",
+            "EventPattern": "{\"detail\":{\"eventName\":[\"StopLogging\",\"DeleteTrail\",\"UpdateTrail\",\"PutEventSelectors\"],\"eventSource\":[\"cloudtrail.amazonaws.com\"]},\"detail-type\":[\"AWS API Call via CloudTrail\"],\"source\":[\"aws.cloudtrail\"]}",
+            "State": "ENABLED",
+            "Description": "CloudTrail logging stopped, deleted or reconfigured (defense evasion)",
+            "EventBusName": "default"
+        },
+        {
+            "Name": "aws-sec-ir-s3-permission-change",
+            "Arn": "arn:aws:events:us-east-1:123456789012:rule/aws-sec-ir-s3-permission-change",
+            "EventPattern": "{\"detail\":{\"eventName\":[\"PutBucketPolicy\",\"DeleteBucketPolicy\",\"PutBucketAcl\",\"PutBucketPublicAccessBlock\",\"DeleteBucketPublicAccessBlock\",\"PutAccountPublicAccessBlock\",\"DeleteAccountPublicAccessBlock\"],\"eventSource\":[\"s3.amazonaws.com\"]},\"detail-type\":[\"AWS API Call via CloudTrail\"],\"source\":[\"aws.s3\"]}",
+            "State": "ENABLED",
+            "Description": "S3 bucket policy, ACL or public access block changed (data exposure path)",
+            "EventBusName": "default"
+        }
+    ]
+}

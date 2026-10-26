@@ -1,0 +1,36 @@
+{
+    "Events": [
+        {
+            "EventId": "7f2eecce-3c9d-4d3a-af66-08acb3924f58",
+            "EventName": "PutBucketPolicy",
+            "ReadOnly": "false",
+            "AccessKeyId": "AKIA_REDACTED",
+            "EventTime": "2026-10-26T10:01:11+04:00",
+            "EventSource": "s3.amazonaws.com",
+            "Username": "aws-sec-ir-deployer",
+            "Resources": [
+                {
+                    "ResourceType": "AWS::S3::Bucket",
+                    "ResourceName": "aws-sec-ir-test-bucket-ahr4827"
+                }
+            ],
+            "CloudTrailEvent": "{\"eventVersion\":\"1.11\",\"userIdentity\":{\"type\":\"IAMUser\",\"principalId\":\"AIDA_REDACTED\",\"arn\":\"arn:aws:iam::123456789012:user/aws-sec-ir-deployer\",\"accountId\":\"123456789012\",\"accessKeyId\":\"AKIA_REDACTED\",\"userName\":\"aws-sec-ir-deployer\"},\"eventTime\":\"2026-10-26T06:01:11Z\",\"eventSource\":\"s3.amazonaws.com\",\"eventName\":\"PutBucketPolicy\",\"awsRegion\":\"us-east-1\",\"sourceIPAddress\":\"203.0.113.10\",\"userAgent\":\"[aws-cli/2.36.40 md/awscrt#0.36.2 ua/2.1 os/macos#24.6.0 md/arch#arm64 lang/python#3.14.7 md/pyimpl#CPython m/b,E,W,AN,Z,n cfg/retry-mode#standard md/installer#source sid/07890b72dcc3 md/prompt#off md/command#s3api.put-bucket-policy]\",\"requestParameters\":{\"bucketPolicy\":{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"DenyInsecureTransport\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"s3:*\",\"Resource\":[\"arn:aws:s3:::aws-sec-ir-test-bucket-ahr4827/*\",\"arn:aws:s3:::aws-sec-ir-test-bucket-ahr4827\"],\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}}}]},\"bucketName\":\"aws-sec-ir-test-bucket-ahr4827\",\"Host\":\"aws-sec-ir-test-bucket-ahr4827.s3.us-east-1.amazonaws.com\",\"policy\":\"\"},\"responseElements\":null,\"additionalEventData\":{\"SignatureVersion\":\"SigV4\",\"CipherSuite\":\"TLS_AES_128_GCM_SHA256\",\"bytesTransferredIn\":279,\"startTime\":1234567890123,\"AuthenticationMethod\":\"AuthHeader\",\"endTime\":1234567890125,\"x-amz-id-2\":\"1vwO1mazZvDPvAUhXk7G1X0TEMxKvL6vUGxWPqnzLE875C81FEsJ0WMQ/b4SbL+YDzeJ2N/8oj8=\",\"httpStatusCode\":204,\"bytesTransferredOut\":0},\"requestID\":\"ZKP3BY37D31W3SB4\",\"eventID\":\"7f2eecce-3c9d-4d3a-af66-08acb3924f58\",\"readOnly\":false,\"resources\":[{\"accountId\":\"123456789012\",\"type\":\"AWS::S3::Bucket\",\"ARN\":\"arn:aws:s3:::aws-sec-ir-test-bucket-ahr4827\"}],\"eventType\":\"AwsApiCall\",\"managementEvent\":true,\"recipientAccountId\":\"123456789012\",\"eventCategory\":\"Management\",\"tlsDetails\":{\"tlsVersion\":\"TLSv1.3\",\"cipherSuite\":\"TLS_AES_128_GCM_SHA256\",\"clientProvidedHostHeader\":\"aws-sec-ir-test-bucket-ahr4827.s3.us-east-1.amazonaws.com\"}}"
+        },
+        {
+            "EventId": "736436a3-11ad-4b1c-9aa5-7137d4326ea9",
+            "EventName": "PutBucketPolicy",
+            "ReadOnly": "false",
+            "AccessKeyId": "AKIA_REDACTED",
+            "EventTime": "2026-10-26T10:01:06+04:00",
+            "EventSource": "s3.amazonaws.com",
+            "Username": "aws-sec-ir-deployer",
+            "Resources": [
+                {
+                    "ResourceType": "AWS::S3::Bucket",
+                    "ResourceName": "aws-sec-ir-test-bucket-ahr4827"
+                }
+            ],
+            "CloudTrailEvent": "{\"eventVersion\":\"1.11\",\"userIdentity\":{\"type\":\"IAMUser\",\"principalId\":\"AIDA_REDACTED\",\"arn\":\"arn:aws:iam::123456789012:user/aws-sec-ir-deployer\",\"accountId\":\"123456789012\",\"accessKeyId\":\"AKIA_REDACTED\",\"userName\":\"aws-sec-ir-deployer\"},\"eventTime\":\"2026-10-26T06:01:06Z\",\"eventSource\":\"s3.amazonaws.com\",\"eventName\":\"PutBucketPolicy\",\"awsRegion\":\"us-east-1\",\"sourceIPAddress\":\"203.0.113.10\",\"userAgent\":\"[aws-cli/2.36.40 md/awscrt#0.36.2 ua/2.1 os/macos#24.6.0 md/arch#arm64 lang/python#3.14.7 md/pyimpl#CPython m/AN,W,E,Z,b,n cfg/retry-mode#standard md/installer#source sid/07890b72dcc3 md/prompt#off md/command#s3api.put-bucket-policy]\",\"requestParameters\":{\"bucketPolicy\":{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"AwsSecIrTestMarker\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"s3:*\",\"Resource\":[\"arn:aws:s3:::aws-sec-ir-test-bucket-ahr4827\",\"arn:aws:s3:::aws-sec-ir-test-bucket-ahr4827/*\"],\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}}}]},\"bucketName\":\"aws-sec-ir-test-bucket-ahr4827\",\"Host\":\"aws-sec-ir-test-bucket-ahr4827.s3.us-east-1.amazonaws.com\",\"policy\":\"\"},\"responseElements\":null,\"additionalEventData\":{\"SignatureVersion\":\"SigV4\",\"CipherSuite\":\"TLS_AES_128_GCM_SHA256\",\"bytesTransferredIn\":275,\"startTime\":1234567890129,\"AuthenticationMethod\":\"AuthHeader\",\"endTime\":1234567890129,\"x-amz-id-2\":\"ahq9wz/KNthYci5Z9O65CMn9I4XUL13DSQsOxFJS13I1Jz4u/jBrEQJnXFxWjTEaxJINwG39Hyb5rH9bH6/W7MpodXuhZOc2\",\"httpStatusCode\":204,\"bytesTransferredOut\":0},\"requestID\":\"3JK4W24JHR9KEZ9J\",\"eventID\":\"736436a3-11ad-4b1c-9aa5-7137d4326ea9\",\"readOnly\":false,\"resources\":[{\"accountId\":\"123456789012\",\"type\":\"AWS::S3::Bucket\",\"ARN\":\"arn:aws:s3:::aws-sec-ir-test-bucket-ahr4827\"}],\"eventType\":\"AwsApiCall\",\"managementEvent\":true,\"recipientAccountId\":\"123456789012\",\"eventCategory\":\"Management\",\"tlsDetails\":{\"tlsVersion\":\"TLSv1.3\",\"cipherSuite\":\"TLS_AES_128_GCM_SHA256\",\"clientProvidedHostHeader\":\"aws-sec-ir-test-bucket-ahr4827.s3.us-east-1.amazonaws.com\"}}"
+        }
+    ]
+}

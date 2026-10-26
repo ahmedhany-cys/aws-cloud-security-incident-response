@@ -1,0 +1,5 @@
+# $ aws s3api get-bucket-versioning --bucket aws-sec-ir-audit-logs-ahr4827
+# 2026-10-26T06:18:43Z
+{
+    "Status": "Enabled"
+}

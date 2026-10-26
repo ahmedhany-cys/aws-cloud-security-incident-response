@@ -1,0 +1,10 @@
+# $ aws events list-targets-by-rule --rule aws-sec-ir-s3-permission-change
+# 2026-10-26T06:18:35Z
+{
+    "Targets": [
+        {
+            "Id": "incident-processor",
+            "Arn": "arn:aws:lambda:us-east-1:123456789012:function:aws-sec-ir-incident-processor"
+        }
+    ]
+}

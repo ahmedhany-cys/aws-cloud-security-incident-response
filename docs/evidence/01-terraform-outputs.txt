@@ -1,0 +1,17 @@
+# $ terraform -chdir=/Users/ahmedhany/aws project (1)/terraform output
+# 2026-10-26T06:18:22Z
+audit_bucket = "aws-sec-ir-audit-logs-ahr4827"
+detection_rule_names = [
+  "aws-sec-ir-iam-policy-change",
+  "aws-sec-ir-logging-tamper",
+  "aws-sec-ir-s3-permission-change",
+]
+incident_bucket = "aws-sec-ir-incident-reports-ahr4827"
+lambda_function_name = "aws-sec-ir-incident-processor"
+lambda_log_group = "/aws/lambda/aws-sec-ir-incident-processor"
+region = "us-east-1"
+test_bucket = "aws-sec-ir-test-bucket-ahr4827"
+test_policy_arn = "arn:aws:iam::123456789012:policy/aws-sec-ir/aws-sec-ir-test-policy"
+test_user_name = "aws-sec-ir-test-user"
+trail_arn = "arn:aws:cloudtrail:us-east-1:123456789012:trail/aws-sec-ir-trail"
+trail_name = "aws-sec-ir-trail"
