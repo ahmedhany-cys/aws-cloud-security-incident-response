@@ -28,3 +28,8 @@ docs/screenshots/raw/
 
 # OS
 .DS_Store
+
+# Local plan dumps (contain the real account ID)
+.plan*.txt
+*.tfplan
+tfplan-destroy
