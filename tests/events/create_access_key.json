@@ -1,0 +1,45 @@
+{
+  "version": "0",
+  "id": "813a7395-923a-5bfb-b533-f33a108120b3",
+  "detail-type": "AWS API Call via CloudTrail",
+  "source": "aws.iam",
+  "account": "123456789012",
+  "time": "2026-10-27T09:03:20Z",
+  "region": "us-east-1",
+  "resources": [],
+  "detail": {
+    "eventVersion": "1.11",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLEBUILDAGENT",
+      "arn": "arn:aws:iam::123456789012:user/build-agent",
+      "accountId": "123456789012",
+      "accessKeyId": "AKIASYNTHETIC0001",
+      "userName": "build-agent"
+    },
+    "eventTime": "2026-10-27T09:03:20Z",
+    "eventSource": "iam.amazonaws.com",
+    "eventName": "CreateAccessKey",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "198.51.100.23",
+    "userAgent": "aws-cli/2.36.40 md/command#synthetic",
+    "requestParameters": {
+      "userName": "support-backup"
+    },
+    "responseElements": {
+      "accessKey": {
+        "userName": "support-backup",
+        "accessKeyId": "AKIASYNTHETIC0002",
+        "status": "Active"
+      }
+    },
+    "requestID": "b478b7b6-b8ef-5398-9b41-4a55a7d655cd",
+    "eventID": "7c61a1e2-886b-5064-9d39-34fc4e7bd897",
+    "readOnly": false,
+    "eventType": "AwsApiCall",
+    "managementEvent": true,
+    "recipientAccountId": "123456789012",
+    "eventCategory": "Management"
+  },
+  "_comment": "synthetic event matching the aws-sec-ir-identity-creation rule"
+}

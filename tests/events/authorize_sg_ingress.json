@@ -1,0 +1,60 @@
+{
+  "version": "0",
+  "id": "d215e78e-d4ea-5084-93f5-25f8bf98d63b",
+  "detail-type": "AWS API Call via CloudTrail",
+  "source": "aws.ec2",
+  "account": "123456789012",
+  "time": "2026-10-27T09:08:15Z",
+  "region": "us-east-1",
+  "resources": [],
+  "detail": {
+    "eventVersion": "1.11",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLEBUILDAGENT",
+      "arn": "arn:aws:iam::123456789012:user/build-agent",
+      "accountId": "123456789012",
+      "accessKeyId": "AKIASYNTHETIC0001",
+      "userName": "build-agent"
+    },
+    "eventTime": "2026-10-27T09:08:15Z",
+    "eventSource": "ec2.amazonaws.com",
+    "eventName": "AuthorizeSecurityGroupIngress",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "198.51.100.23",
+    "userAgent": "aws-cli/2.36.40 md/command#synthetic",
+    "requestParameters": {
+      "groupId": "sg-0a1b2c3d4e5f60718",
+      "ipPermissions": {
+        "items": [
+          {
+            "ipProtocol": "tcp",
+            "fromPort": 22,
+            "toPort": 22,
+            "groups": {},
+            "ipRanges": {
+              "items": [
+                {
+                  "cidrIp": "0.0.0.0/0"
+                }
+              ]
+            },
+            "ipv6Ranges": {},
+            "prefixListIds": {}
+          }
+        ]
+      }
+    },
+    "responseElements": {
+      "_return": true
+    },
+    "requestID": "11dffda8-76d3-5217-ad8d-d33ca47976b4",
+    "eventID": "d40230b7-9a9b-56bb-a56e-755229969b8d",
+    "readOnly": false,
+    "eventType": "AwsApiCall",
+    "managementEvent": true,
+    "recipientAccountId": "123456789012",
+    "eventCategory": "Management"
+  },
+  "_comment": "synthetic event matching the aws-sec-ir-network-exposure rule"
+}

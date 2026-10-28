@@ -1,0 +1,40 @@
+{
+  "version": "0",
+  "id": "3ace04f2-a8f3-569c-bf85-19c79b8863f4",
+  "detail-type": "AWS API Call via CloudTrail",
+  "source": "aws.iam",
+  "account": "123456789012",
+  "time": "2026-10-27T09:06:00Z",
+  "region": "us-east-1",
+  "resources": [],
+  "detail": {
+    "eventVersion": "1.11",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLEBUILDAGENT",
+      "arn": "arn:aws:iam::123456789012:user/build-agent",
+      "accountId": "123456789012",
+      "accessKeyId": "AKIASYNTHETIC0001",
+      "userName": "build-agent"
+    },
+    "eventTime": "2026-10-27T09:06:00Z",
+    "eventSource": "iam.amazonaws.com",
+    "eventName": "UpdateAssumeRolePolicy",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "198.51.100.23",
+    "userAgent": "aws-cli/2.36.40 md/command#synthetic",
+    "requestParameters": {
+      "roleName": "prod-deploy-role",
+      "policyDocument": "{\"Version\": \"2012-10-17\", \"Statement\": [{\"Effect\": \"Allow\", \"Principal\": {\"Service\": \"codebuild.amazonaws.com\"}, \"Action\": \"sts:AssumeRole\"}, {\"Effect\": \"Allow\", \"Principal\": {\"AWS\": \"arn:aws:iam::111122223333:root\"}, \"Action\": \"sts:AssumeRole\"}]}"
+    },
+    "responseElements": null,
+    "requestID": "4149aeb6-2e37-592c-8889-fb0af9e574bf",
+    "eventID": "c12b17b8-22a0-5733-bc54-9fb293595d81",
+    "readOnly": false,
+    "eventType": "AwsApiCall",
+    "managementEvent": true,
+    "recipientAccountId": "123456789012",
+    "eventCategory": "Management"
+  },
+  "_comment": "synthetic event matching the aws-sec-ir-role-trust-change rule"
+}

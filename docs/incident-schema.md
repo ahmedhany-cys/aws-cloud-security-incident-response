@@ -1,4 +1,4 @@
-# Incident report schema (v1.0)
+# Incident report schema (v1.1)
 
 Every detection produces exactly one JSON object at
 `s3://<incident-bucket>/incidents/YYYY/MM/DD/<eventID>.json`. The date comes
@@ -12,7 +12,10 @@ duplicate (idempotent writes).
 | `incident_id` | string | `"inc-" + detail.eventID` | Stable, unique per CloudTrail event |
 | `detected_at` | string (ISO 8601, UTC) | Lambda clock | When the Lambda processed the event |
 | `event_time` | string (ISO 8601, UTC) | `detail.eventTime` | When the API call happened |
-| `severity` | `CRITICAL` / `HIGH` / `MEDIUM` | lookup table | See below |
+| `severity` | `CRITICAL` / `HIGH` / `MEDIUM` / `LOW` | from `severity_score` | Bands: 85+, 60+, 35+, below 35 |
+| `severity_score` | integer 0-100 | `score_event()` | Base score per event plus context modifiers; see [severity-scoring.md](severity-scoring.md) |
+| `score_factors[]` | list of `{factor, points}` | `score_event()` | Explains the score line by line |
+| `tactic` | string or null | lookup table | MITRE ATT&CK tactic, e.g. `privilege_escalation` |
 | `category` | string | lookup table | `iam_policy_change`, `logging_tamper`, `s3_permission_change`, `unclassified` |
 | `event_name` | string | `detail.eventName` | e.g. `AttachUserPolicy` |
 | `event_source` | string | `detail.eventSource` | e.g. `iam.amazonaws.com` |
@@ -27,6 +30,7 @@ duplicate (idempotent writes).
 | `error_code` | string or null | `detail.errorCode` | Present for denied/failed attempts, which are still worth an incident |
 | `error_message` | string or null | `detail.errorMessage` | |
 | `recommended_actions[]` | list of string | lookup table | Analyst playbook for this category |
+| `remediation[]` | list of `{step, command}` | `build_remediation()` | Concrete steps for this event with real resource names; `command` is null for console-only steps |
 | `raw_event_id` | string | `detail.eventID` | Use with `aws cloudtrail lookup-events` to fetch the full record. For health-check incidents it is the incident reference instead |
 | `detection_source` | `eventbridge` / `scheduled_health_check` | handler | Which path detected it |
 
@@ -40,7 +44,7 @@ The scheduled trail health check writes the same schema with these differences:
 - `request_parameters` holds the status fields `is_logging`, `stop_logging_time`, `start_logging_time` and `latest_delivery_error`.
 - The key is `incidents/YYYY/MM/DD/trail-health-<trail>-<problem>-<stop epoch>.json`, so one stop gives one incident however many checks run.
 
-## Severity table (lookup in `lambda/incident_processor.py`)
+## Default severity per event (before context; see severity-scoring.md for scores)
 
 | Category | Event names | Severity |
 |---|---|---|
@@ -48,6 +52,11 @@ The scheduled trail health check writes the same schema with these differences:
 | `logging_tamper` | StopLogging, DeleteTrail, UpdateTrail, PutEventSelectors | CRITICAL |
 | `s3_permission_change` | PutBucketPolicy, DeleteBucketPolicy, PutBucketAcl, PutBucketPublicAccessBlock, DeleteBucketPublicAccessBlock, PutAccountPublicAccessBlock, DeleteAccountPublicAccessBlock | HIGH |
 | `logging_tamper` (scheduled check) | TrailNotLogging, TrailMissing | CRITICAL |
+| `identity_creation` | CreateAccessKey, CreateLoginProfile, UpdateLoginProfile (CreateUser: MEDIUM) | MEDIUM |
+| `mfa_tampering` | DeactivateMFADevice, DeleteVirtualMFADevice | HIGH |
+| `role_trust_change` | UpdateAssumeRolePolicy | HIGH |
+| `network_exposure` | AuthorizeSecurityGroupIngress | MEDIUM |
+| `kms_key_destruction` | ScheduleKeyDeletion (CRITICAL), DisableKey (HIGH) | CRITICAL / HIGH |
 | `unclassified` | anything else that reaches the Lambda | MEDIUM |
 
 ## Example

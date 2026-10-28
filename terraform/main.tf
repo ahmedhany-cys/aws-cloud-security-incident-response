@@ -63,5 +63,39 @@ locals {
         "PutAccountPublicAccessBlock", "DeleteAccountPublicAccessBlock",
       ]
     }
+
+    # --- added 2026-10-28: five new incident types. Event names checked
+    # against the AWS service reference (IAM, EC2, KMS) and, for KMS, the
+    # CloudTrail log examples; IAM, EC2 and KMS log the API name as eventName.
+    identity-creation = {
+      description  = "New IAM user, access key or console password (persistence)"
+      source       = "aws.iam"
+      event_source = "iam.amazonaws.com"
+      event_names  = ["CreateUser", "CreateAccessKey", "CreateLoginProfile", "UpdateLoginProfile"]
+    }
+    mfa-tampering = {
+      description  = "MFA device deactivated or deleted (defense evasion)"
+      source       = "aws.iam"
+      event_source = "iam.amazonaws.com"
+      event_names  = ["DeactivateMFADevice", "DeleteVirtualMFADevice"]
+    }
+    role-trust-change = {
+      description  = "Role trust policy changed (possible cross-account backdoor)"
+      source       = "aws.iam"
+      event_source = "iam.amazonaws.com"
+      event_names  = ["UpdateAssumeRolePolicy"]
+    }
+    network-exposure = {
+      description  = "Security group ingress rule added (possible internet exposure)"
+      source       = "aws.ec2"
+      event_source = "ec2.amazonaws.com"
+      event_names  = ["AuthorizeSecurityGroupIngress"]
+    }
+    kms-key-destruction = {
+      description  = "KMS key scheduled for deletion or disabled (impact)"
+      source       = "aws.kms"
+      event_source = "kms.amazonaws.com"
+      event_names  = ["ScheduleKeyDeletion", "DisableKey"]
+    }
   }
 }

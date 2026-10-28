@@ -1,0 +1,40 @@
+{
+  "version": "0",
+  "id": "7fb80964-6998-5d80-8ab9-beaf72b24fb7",
+  "detail-type": "AWS API Call via CloudTrail",
+  "source": "aws.iam",
+  "account": "123456789012",
+  "time": "2026-10-27T09:07:30Z",
+  "region": "us-east-1",
+  "resources": [],
+  "detail": {
+    "eventVersion": "1.11",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLEBUILDAGENT",
+      "arn": "arn:aws:iam::123456789012:user/build-agent",
+      "accountId": "123456789012",
+      "accessKeyId": "AKIASYNTHETIC0001",
+      "userName": "build-agent"
+    },
+    "eventTime": "2026-10-27T09:07:30Z",
+    "eventSource": "iam.amazonaws.com",
+    "eventName": "DeactivateMFADevice",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "198.51.100.23",
+    "userAgent": "aws-cli/2.36.40 md/command#synthetic",
+    "requestParameters": {
+      "userName": "admin-ops",
+      "serialNumber": "arn:aws:iam::123456789012:mfa/admin-ops"
+    },
+    "responseElements": null,
+    "requestID": "21c705a4-d849-5b86-92b0-2499bd8ccd09",
+    "eventID": "c839a22d-0ffe-5bd0-a82a-e5654ec9821e",
+    "readOnly": false,
+    "eventType": "AwsApiCall",
+    "managementEvent": true,
+    "recipientAccountId": "123456789012",
+    "eventCategory": "Management"
+  },
+  "_comment": "synthetic event matching the aws-sec-ir-mfa-tampering rule"
+}

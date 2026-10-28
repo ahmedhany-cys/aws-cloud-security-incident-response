@@ -1,0 +1,50 @@
+{
+  "version": "0",
+  "id": "1245527c-c544-5103-acd5-a53637d38fe3",
+  "detail-type": "AWS API Call via CloudTrail",
+  "source": "aws.kms",
+  "account": "123456789012",
+  "time": "2026-10-27T09:43:00Z",
+  "region": "us-east-1",
+  "resources": [],
+  "detail": {
+    "eventVersion": "1.11",
+    "userIdentity": {
+      "type": "IAMUser",
+      "principalId": "AIDAEXAMPLEBUILDAGENT",
+      "arn": "arn:aws:iam::123456789012:user/build-agent",
+      "accountId": "123456789012",
+      "accessKeyId": "AKIASYNTHETIC0001",
+      "userName": "build-agent"
+    },
+    "eventTime": "2026-10-27T09:43:00Z",
+    "eventSource": "kms.amazonaws.com",
+    "eventName": "ScheduleKeyDeletion",
+    "awsRegion": "us-east-1",
+    "sourceIPAddress": "198.51.100.23",
+    "userAgent": "aws-cli/2.36.40 md/command#synthetic",
+    "requestParameters": {
+      "keyId": "arn:aws:kms:us-east-1:123456789012:key/1a2b3c4d-1111-4a4a-8b8b-0c0c0c0c0c01",
+      "pendingWindowInDays": 7
+    },
+    "responseElements": {
+      "keyId": "arn:aws:kms:us-east-1:123456789012:key/1a2b3c4d-1111-4a4a-8b8b-0c0c0c0c0c01",
+      "deletionDate": "Nov 3, 2026, 12:00:00 AM",
+      "keyState": "PendingDeletion"
+    },
+    "requestID": "8fc0735a-ddee-5b70-8f20-6d394cc5d17f",
+    "eventID": "535762ef-6d3d-508e-a164-25075a7abad8",
+    "readOnly": false,
+    "eventType": "AwsApiCall",
+    "managementEvent": true,
+    "recipientAccountId": "123456789012",
+    "eventCategory": "Management",
+    "resources": [
+      {
+        "type": "AWS::KMS::Key",
+        "ARN": "arn:aws:kms:us-east-1:123456789012:key/1a2b3c4d-1111-4a4a-8b8b-0c0c0c0c0c01"
+      }
+    ]
+  },
+  "_comment": "synthetic event matching the aws-sec-ir-kms-key-destruction rule"
+}
