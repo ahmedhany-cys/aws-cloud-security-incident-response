@@ -91,3 +91,13 @@ Running record of what was done, what was verified, and decisions taken.
 
 - Removed the `Co-Authored-By` trailer from all 14 commits (`git filter-branch --msg-filter`; file contents unchanged, verified with an empty diff) and force-pushed `main` with a lease, after the owner allowed force-push for this repo.
 - Verified on GitHub: 14 commits, 0 co-author lines, only `ahmedhany-cys` as author, `stats/contributors` = `ahmedhany-cys: 14`. The repo page's contributor sidebar is cached separately and refreshes on the next push.
+
+## 2026-10-28 — Five new incident types, scoring, timeline, resilience tests
+
+- Request: five new simulated incident types; an incident timeline from synthetic CloudTrail JSON; severity scoring and remediation recommendations; tests for missing events, duplicate events and failed notifications.
+- Event names verified first (lesson from T5): all 12 IAM/EC2/KMS names exist in the AWS service reference; KMS CloudTrail examples show ScheduleKeyDeletion and DisableKey as logged names; EC2's CloudTrail example logs the API name. KMS API reference confirms CancelKeyDeletion leaves the key Disabled (so remediation re-enables it).
+- New types: identity_creation, mfa_tampering, role_trust_change, network_exposure, kms_key_destruction. Added to the Lambda lookup and as 5 EventBridge rules in Terraform (not yet applied).
+- Scoring: 0-100 score from per-event base plus context modifiers, bands CRITICAL/HIGH/MEDIUM/LOW; original rules keep their severities. Reports now include severity_score, score_factors, tactic and remediation (schema 1.1).
+- Notifications: report stored before alerting; alert failure logs `alert_failed` with the S3 key and raises NotificationError so Lambda retries; S3 failure never alerts. At-least-once alerts documented.
+- Simulation: `simulation/generate_scenario.py` (deterministic messy CloudTrail log + 5 sample events), `simulation/timeline.py` (validate, de-duplicate, sort, score, find logging gaps, correlate incidents). Fixed during review: a conflicting duplicate kept in place of the original because of shuffle order (generator now appends it after), failed calls no longer get roll-back steps, wording.
+- Tests: 32 -> 86, all passing.

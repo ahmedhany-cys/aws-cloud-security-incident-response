@@ -95,6 +95,11 @@ Full diagram and component descriptions: [docs/architecture.md](docs/architectur
 |---|---|---|---|
 | IAM policy change | `aws.iam` | AttachUserPolicy, AttachRolePolicy, AttachGroupPolicy, PutUserPolicy, PutRolePolicy, PutGroupPolicy, CreatePolicy, CreatePolicyVersion, SetDefaultPolicyVersion | HIGH |
 | Logging tamper | `aws.cloudtrail` | StopLogging, DeleteTrail, UpdateTrail, PutEventSelectors | CRITICAL |
+| Identity creation | `aws.iam` | CreateUser, CreateAccessKey, CreateLoginProfile, UpdateLoginProfile | MEDIUM, scored up for keys made for other users |
+| MFA tampering | `aws.iam` | DeactivateMFADevice, DeleteVirtualMFADevice | HIGH |
+| Role trust change | `aws.iam` | UpdateAssumeRolePolicy | HIGH, CRITICAL if it trusts another account |
+| Network exposure | `aws.ec2` | AuthorizeSecurityGroupIngress | MEDIUM, HIGH if open to the internet on an admin port |
+| KMS key destruction | `aws.kms` | ScheduleKeyDeletion, DisableKey | CRITICAL / HIGH |
 | Trail not logging / missing (scheduled check) | EventBridge Scheduler, every 5 min | `TrailNotLogging`, `TrailMissing` (from `GetTrailStatus`) | CRITICAL |
 | S3 permission change | `aws.s3` | PutBucketPolicy, DeleteBucketPolicy, PutBucketAcl, PutBucketPublicAccessBlock, DeleteBucketPublicAccessBlock, PutAccountPublicAccessBlock, DeleteAccountPublicAccessBlock | HIGH |
 
@@ -102,6 +107,11 @@ The rule patterns use CloudTrail **event** names, which are not always the API
 operation names. S3 records the `PutPublicAccessBlock` API as
 `PutBucketPublicAccessBlock` (bucket level) or `PutAccountPublicAccessBlock`
 (account level). Test T5 caught this; see the design decisions.
+
+Severities are not fixed per rule: each incident gets a 0-100 score from a
+base value plus context (root actor, admin policy, internet exposure,
+cross-account trust, failed attempt, ...) and concrete remediation commands.
+See [docs/severity-scoring.md](docs/severity-scoring.md).
 
 Why these and not others: [docs/design-decisions.md](docs/design-decisions.md).
 Report format: [docs/incident-schema.md](docs/incident-schema.md).
@@ -181,7 +191,17 @@ Then collect general stack evidence:
 AWS_PROFILE=sec-ir scripts/collect_evidence.sh
 ```
 
-Both write redacted outputs to `docs/evidence/`. Scenario definitions and
+Both write redacted outputs to `docs/evidence/`.
+
+Offline attack simulation and incident timeline (no AWS needed):
+
+```bash
+.venv/bin/python simulation/generate_scenario.py
+.venv/bin/python simulation/timeline.py simulation/scenarios/compromised-build-agent.json --out-md /tmp/timeline.md
+```
+
+See [docs/simulation.md](docs/simulation.md) and the generated
+[timeline](docs/evidence/simulation/timeline.md). Scenario definitions and
 results: [docs/test-cases.md](docs/test-cases.md).
 
 ## Continuous integration
@@ -202,7 +222,7 @@ Terraform providers, the Python dev dependencies and the GitHub Actions.
 
 ## Results summary
 
-Tested on 2026-10-26. Unit tests: 32 passed.
+Tested on 2026-10-26 (live) and 2026-10-28 (simulation). Unit tests: 86 passed.
 
 | ID | Scenario | Expected | Result |
 |---|---|---|---|
@@ -254,7 +274,6 @@ Empty the versioned buckets, then `terraform destroy`, then confirm no
 ## Future improvements
 
 - Root console sign-in detection (`aws.signin` / `ConsoleLogin` with `userIdentity.type = Root`).
-- Access-key and user creation detection (`CreateAccessKey`, `CreateUser`, `CreateLoginProfile`).
 - SNS email (already wired, `enable_email_alerts = true`) or Slack via a webhook Lambda.
 - Automated remediation for CRITICAL events (auto `start-logging`), with a tightly scoped remediation role.
 - GuardDuty and Security Hub integration when cost is not a constraint.

@@ -99,10 +99,53 @@ T4 and T5 put the test bucket back the way it was (re-apply the bucket policy, r
 - *A second trail, or an organization trail in a separate account.* Then stopping one trail does not blind EventBridge. A second copy of management events is billed, so it is outside the cost guardrails.
 - *Preventive control.* An SCP or IAM deny on `cloudtrail:StopLogging` / `DeleteTrail` for everyone except a break-glass role. This needs AWS Organizations for SCPs.
 
-## 13. Known limitations
+## 13. Severity scoring instead of fixed severities (added 2026-10-28)
+
+A fixed severity per rule cannot tell "someone opened port 443 to an office
+range" from "someone opened SSH to the whole internet". Each event now gets a
+0-100 score: a base value for the event plus points for context found in the
+request (root actor, administrator access, internet exposure, admin ports,
+cross-account trust, public bucket, key deletion window) and minus points when
+the call failed. Every report lists the factors, so a score can be explained
+in one line each, which matters more to an analyst than the number itself.
+The original rules keep their old severities, so nothing that worked before
+changed meaning. Details: [severity-scoring.md](severity-scoring.md).
+
+**Trade-off:** the modifiers are hand-picked rules, not a statistical model.
+They are predictable and testable, but they will miss context they do not look
+for (for example, who normally makes a change).
+
+## 14. The five new incident types, and why they are simulated
+
+Identity creation (persistence), MFA tampering (defense evasion), role trust
+changes (cross-account backdoor), security group exposure (initial access) and
+KMS key destruction (impact) fill the obvious gaps in the original three
+rules. Event names were checked against the AWS service reference; KMS's
+CloudTrail examples confirm its event names, and IAM, EC2 and KMS log the API
+name as the event name.
+
+They are tested with synthetic CloudTrail data, not live calls: creating
+access keys or console passwords is forbidden by the project rules, and MFA
+devices, security groups and KMS keys are not project resources. The rules are
+real EventBridge rules (free), so the deployed system will detect these events.
+Not observed live yet; that is listed as a limitation.
+
+## 15. Alert delivery: at-least-once, store first
+
+The report is written to S3 before any alert. If the alert fails, the error is
+logged with the S3 key and the invocation fails, so Lambda's asynchronous
+retry tries again; the S3 write overwrites the same object, so a retry never
+duplicates the report. If the S3 write fails, no alert is sent. A duplicate
+EventBridge delivery can therefore produce a duplicate email; that is a
+deliberate choice, because for security alerts a duplicate is better than a
+silent loss. Exactly-once alerts would need extra state (for example a
+conditional-write marker per event) and broader S3 permissions.
+
+## 16. Known limitations
 
 - Detection latency depends on CloudTrail → EventBridge delivery. In testing it was 2 to 30 seconds.
 - `StopLogging` on the account's only trail is not always caught by the EventBridge path (see section 12); the scheduled health check catches the stopped trail within about 5 minutes instead.
 - Only management events; no S3 object-level or Lambda data events.
+- The five types added on 2026-10-28 are tested with synthetic events only (see section 14).
 - Single account, single region.
 - No automated remediation (for example, automatically re-enabling logging). The report recommends actions; a human applies them. This was deliberate: automated remediation needs broader IAM permissions, which contradicts the least-privilege goal of the responder.

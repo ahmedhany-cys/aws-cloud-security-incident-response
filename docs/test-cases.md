@@ -26,7 +26,30 @@ actor extraction (IAM user, assumed role, root), sanitization of secrets,
 idempotent key naming, the S3 write, optional SNS publish, loud failure on bad
 input or S3 errors, and JSON-line logging.
 
-Latest run: 32 passed (2026-10-26), including a regression test for the S3 event-name bug and 8 tests for the trail health check (healthy, stopped, missing trail, repeated checks, error handling).
+Latest run: 86 passed (2026-10-28).
+
+| File | Tests | Covers |
+|---|---|---|
+| `test_incident_processor.py` | 24 | original classification, schema, actor, sanitization, idempotent keys, logging, S3 event-name regression |
+| `test_trail_health_check.py` | 8 | scheduled health check |
+| `test_new_incident_types.py` | 28 | the five new types, every scoring modifier, severity bands, remediation commands |
+| `test_resilience.py` | 26 | missing events and fields, duplicate events, failed notifications, the full synthetic scenario |
+
+## Simulation tests (2026-10-28, offline)
+
+| ID | Scenario | Expected | Result |
+|---|---|---|---|
+| S1 | Five new incident types from synthetic EventBridge events | correct category, tactic, score and specific remediation | PASS |
+| S2 | Failed SNS alert | report stored first, `alert_failed` logged with S3 key, invocation fails | PASS |
+| S3 | Retry after failed alert | same S3 key overwritten, alert sent once on retry | PASS |
+| S4 | S3 write fails | no alert sent | PASS |
+| S5 | Duplicate EventBridge delivery | one report; alert at-least-once (two sends, documented) | PASS |
+| S6 | Duplicate and conflicting records in a log | duplicates counted once; conflict flagged, first copy kept | PASS |
+| S7 | Records missing eventID / eventTime / eventName / eventSource, or bad timestamp | rejected with reason, run continues | PASS |
+| S8 | Missing events: trail stopped and restarted / never restarted | visibility gap reported with duration / reported as still open | PASS |
+| S9 | Full scenario: shuffled log of 23 records | sorted timeline, 2 incidents, campaign score 100, backdoor identity linked | PASS |
+
+Evidence: [evidence/simulation/timeline.md](evidence/simulation/timeline.md).
 
 ## Run log
 
