@@ -1,0 +1,844 @@
+{
+  "counts": {
+    "records_in": 23,
+    "accepted": 16,
+    "rejected": 3,
+    "duplicate_deliveries": 3,
+    "conflicts": 1,
+    "detections": 10,
+    "context_events": 5,
+    "unclassified_changes": 1,
+    "incidents": 2,
+    "visibility_gaps": 1
+  },
+  "incidents": [
+    {
+      "actor": "build-agent",
+      "actor_key": "arn:aws:iam::123456789012:user/build-agent",
+      "source_ips": [
+        "198.51.100.23"
+      ],
+      "start": "2026-10-27T09:03:00Z",
+      "end": "2026-10-27T09:43:00Z",
+      "duration_minutes": 40.0,
+      "detections": 9,
+      "failed_attempts": 1,
+      "event_ids": [
+        "8c803f89-0760-587f-974e-54a4c58da286",
+        "7c61a1e2-886b-5064-9d39-34fc4e7bd897",
+        "5d9f979c-fe5f-5366-84b3-34a14a90bf7b",
+        "c5c096fd-698c-5a49-ba5c-ff918ea81092",
+        "c12b17b8-22a0-5733-bc54-9fb293595d81",
+        "c839a22d-0ffe-5bd0-a82a-e5654ec9821e",
+        "d40230b7-9a9b-56bb-a56e-755229969b8d",
+        "7e3e1525-dca4-56ee-95ed-2fb443a25a5d",
+        "535762ef-6d3d-508e-a164-25075a7abad8"
+      ],
+      "stages": [
+        "initial_access",
+        "persistence",
+        "privilege_escalation",
+        "defense_evasion",
+        "impact"
+      ],
+      "categories": [
+        "iam_policy_change",
+        "identity_creation",
+        "kms_key_destruction",
+        "logging_tamper",
+        "mfa_tampering",
+        "network_exposure",
+        "role_trust_change"
+      ],
+      "max_event_score": 90,
+      "campaign_score": 100,
+      "campaign_bonus": 20,
+      "severity": "CRITICAL",
+      "identities_created": [
+        "support-backup"
+      ],
+      "reconnaissance_before": [
+        "2026-10-27T09:00:05Z GetCallerIdentity",
+        "2026-10-27T09:01:10Z ListUsers",
+        "2026-10-27T09:01:40Z ListAttachedUserPolicies"
+      ],
+      "remediation": [
+        {
+          "step": "Inspect the current trust policy",
+          "command": "aws iam get-role --role-name prod-deploy-role --query Role.AssumeRolePolicyDocument",
+          "for_event": "UpdateAssumeRolePolicy at 2026-10-27T09:06:00Z"
+        },
+        {
+          "step": "Restore the trust policy from source control",
+          "command": "aws iam update-assume-role-policy --role-name prod-deploy-role --policy-document file://known-good-trust.json",
+          "for_event": "UpdateAssumeRolePolicy at 2026-10-27T09:06:00Z"
+        },
+        {
+          "step": "Revoke active sessions: IAM > Roles > prod-deploy-role > Revoke sessions",
+          "command": null,
+          "for_event": "UpdateAssumeRolePolicy at 2026-10-27T09:06:00Z"
+        },
+        {
+          "step": "If the actor's access was not expected, deactivate the key it used",
+          "command": "aws iam update-access-key --user-name build-agent --access-key-id AKIASYNTHETIC0001 --status Inactive",
+          "for_event": "UpdateAssumeRolePolicy at 2026-10-27T09:06:00Z"
+        },
+        {
+          "step": "Restart logging",
+          "command": "aws cloudtrail start-logging --name aws-sec-ir-trail",
+          "for_event": "StopLogging at 2026-10-27T09:10:00Z"
+        },
+        {
+          "step": "Confirm the trail is logging",
+          "command": "aws cloudtrail get-trail-status --name aws-sec-ir-trail",
+          "for_event": "StopLogging at 2026-10-27T09:10:00Z"
+        },
+        {
+          "step": "Compare event selectors with the baseline",
+          "command": "aws cloudtrail get-event-selectors --trail-name aws-sec-ir-trail",
+          "for_event": "StopLogging at 2026-10-27T09:10:00Z"
+        },
+        {
+          "step": "Cancel the deletion now",
+          "command": "aws kms cancel-key-deletion --key-id arn:aws:kms:us-east-1:123456789012:key/1a2b3c4d-1111-4a4a-8b8b-0c0c0c0c0c01",
+          "for_event": "ScheduleKeyDeletion at 2026-10-27T09:43:00Z"
+        },
+        {
+          "step": "Re-enable the key (a cancelled or disabled key stays Disabled)",
+          "command": "aws kms enable-key --key-id arn:aws:kms:us-east-1:123456789012:key/1a2b3c4d-1111-4a4a-8b8b-0c0c0c0c0c01",
+          "for_event": "ScheduleKeyDeletion at 2026-10-27T09:43:00Z"
+        },
+        {
+          "step": "Remove the permission if it was not authorised",
+          "command": "aws iam detach-user-policy --user-name support-backup --policy-arn arn:aws:iam::aws:policy/AdministratorAccess",
+          "for_event": "AttachUserPolicy at 2026-10-27T09:04:00Z"
+        },
+        {
+          "step": "Revoke the internet-facing rule on sg-0a1b2c3d4e5f60718",
+          "command": "aws ec2 revoke-security-group-ingress --group-id sg-0a1b2c3d4e5f60718 --protocol tcp --port 22 --cidr 0.0.0.0/0",
+          "for_event": "AuthorizeSecurityGroupIngress at 2026-10-27T09:08:15Z"
+        },
+        {
+          "step": "List the user's remaining MFA devices",
+          "command": "aws iam list-mfa-devices --user-name admin-ops",
+          "for_event": "DeactivateMFADevice at 2026-10-27T09:07:30Z"
+        },
+        {
+          "step": "Re-enrol MFA for admin-ops in the console: IAM > Users > admin-ops > Security credentials",
+          "command": null,
+          "for_event": "DeactivateMFADevice at 2026-10-27T09:07:30Z"
+        },
+        {
+          "step": "Deactivate the new access key (keep it for evidence)",
+          "command": "aws iam update-access-key --user-name support-backup --access-key-id AKIASYNTHETIC0002 --status Inactive",
+          "for_event": "CreateAccessKey at 2026-10-27T09:03:20Z"
+        },
+        {
+          "step": "The call failed, so nothing changed. Investigate why the principal attempted it.",
+          "command": "aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=build-agent",
+          "for_event": "PutRolePolicy at 2026-10-27T09:04:30Z"
+        },
+        {
+          "step": "Check the new user's keys and permissions",
+          "command": "aws iam list-access-keys --user-name support-backup",
+          "for_event": "CreateUser at 2026-10-27T09:03:00Z"
+        },
+        {
+          "step": "List its attached policies",
+          "command": "aws iam list-attached-user-policies --user-name support-backup",
+          "for_event": "CreateUser at 2026-10-27T09:03:00Z"
+        }
+      ],
+      "incident": "INC-001"
+    },
+    {
+      "actor": "root",
+      "actor_key": "arn:aws:iam::123456789012:root",
+      "source_ips": [
+        "203.0.113.77"
+      ],
+      "start": "2026-10-27T14:00:00Z",
+      "end": "2026-10-27T14:00:00Z",
+      "duration_minutes": 0.0,
+      "detections": 1,
+      "failed_attempts": 0,
+      "event_ids": [
+        "a6a96fe4-ac93-5d9c-86e4-b6dcdded9dcf"
+      ],
+      "stages": [
+        "impact"
+      ],
+      "categories": [
+        "kms_key_destruction"
+      ],
+      "max_event_score": 95,
+      "campaign_score": 95,
+      "campaign_bonus": 0,
+      "severity": "CRITICAL",
+      "identities_created": [],
+      "reconnaissance_before": [],
+      "remediation": [
+        {
+          "step": "Re-enable the key (a cancelled or disabled key stays Disabled)",
+          "command": "aws kms enable-key --key-id arn:aws:kms:us-east-1:123456789012:key/1a2b3c4d-2222-4a4a-8b8b-0c0c0c0c0c02",
+          "for_event": "DisableKey at 2026-10-27T14:00:00Z"
+        },
+        {
+          "step": "Root was used: rotate the root password, confirm root MFA, and delete any root access keys",
+          "command": null,
+          "for_event": "DisableKey at 2026-10-27T14:00:00Z"
+        }
+      ],
+      "incident": "INC-002"
+    }
+  ],
+  "visibility_gaps": [
+    {
+      "trail": "aws-sec-ir-trail",
+      "from": "2026-10-27T09:10:00Z",
+      "opened_by": "StopLogging",
+      "actor": "build-agent",
+      "to": "2026-10-27T09:41:00Z",
+      "closed_by": "StartLogging by security-oncall",
+      "minutes": 31.0,
+      "events_seen_inside": 0,
+      "note": "Trail was not logging: events in this window may be missing from the trail's log files. Cross-check CloudTrail Event history, which is independent of the trail."
+    }
+  ],
+  "timeline": [
+    {
+      "time": "2026-10-27T08:55:12Z",
+      "event_id": "6dae9ea6-5646-58fe-a49a-aef881fcfd6b",
+      "event_name": "DescribeInstances",
+      "event_source": "ec2.amazonaws.com",
+      "actor": "reporting-user",
+      "actor_key": "arn:aws:iam::123456789012:user/reporting-user",
+      "source_ip": "203.0.113.10",
+      "read_only": true,
+      "kind": "context",
+      "category": null,
+      "tactic": null,
+      "severity": null,
+      "severity_score": null,
+      "score_factors": [],
+      "error_code": null,
+      "resources": [],
+      "remediation": [],
+      "duplicate_deliveries": 0,
+      "conflicting_copy": false
+    },
+    {
+      "time": "2026-10-27T09:00:05Z",
+      "event_id": "f83273df-efb0-55d5-bd72-dd0348eab20b",
+      "event_name": "GetCallerIdentity",
+      "event_source": "sts.amazonaws.com",
+      "actor": "build-agent",
+      "actor_key": "arn:aws:iam::123456789012:user/build-agent",
+      "source_ip": "198.51.100.23",
+      "read_only": true,
+      "kind": "context",
+      "category": null,
+      "tactic": null,
+      "severity": null,
+      "severity_score": null,
+      "score_factors": [],
+      "error_code": null,
+      "resources": [],
+      "remediation": [],
+      "duplicate_deliveries": 0,
+      "conflicting_copy": false
+    },
+    {
+      "time": "2026-10-27T09:01:10Z",
+      "event_id": "68bf093c-5b49-58ac-9486-5c763022589d",
+      "event_name": "ListUsers",
+      "event_source": "iam.amazonaws.com",
+      "actor": "build-agent",
+      "actor_key": "arn:aws:iam::123456789012:user/build-agent",
+      "source_ip": "198.51.100.23",
+      "read_only": true,
+      "kind": "context",
+      "category": null,
+      "tactic": null,
+      "severity": null,
+      "severity_score": null,
+      "score_factors": [],
+      "error_code": null,
+      "resources": [],
+      "remediation": [],
+      "duplicate_deliveries": 0,
+      "conflicting_copy": false
+    },
+    {
+      "time": "2026-10-27T09:01:40Z",
+      "event_id": "92377d30-771d-5a07-aff0-53aee2fcf9a4",
+      "event_name": "ListAttachedUserPolicies",
+      "event_source": "iam.amazonaws.com",
+      "actor": "build-agent",
+      "actor_key": "arn:aws:iam::123456789012:user/build-agent",
+      "source_ip": "198.51.100.23",
+      "read_only": true,
+      "kind": "context",
+      "category": null,
+      "tactic": null,
+      "severity": null,
+      "severity_score": null,
+      "score_factors": [],
+      "error_code": null,
+      "resources": [
+        {
+          "type": "AWS::IAM::User",
+          "identifier": "build-agent"
+        }
+      ],
+      "remediation": [],
+      "duplicate_deliveries": 0,
+      "conflicting_copy": false
+    },
+    {
+      "time": "2026-10-27T09:03:00Z",
+      "event_id": "8c803f89-0760-587f-974e-54a4c58da286",
+      "event_name": "CreateUser",
+      "event_source": "iam.amazonaws.com",
+      "actor": "build-agent",
+      "actor_key": "arn:aws:iam::123456789012:user/build-agent",
+      "source_ip": "198.51.100.23",
+      "read_only": false,
+      "kind": "detection",
+      "category": "identity_creation",
+      "tactic": "persistence",
+      "severity": "MEDIUM",
+      "severity_score": 45,
+      "score_factors": [
+        {
+          "factor": "base score for identity_creation (CreateUser)",
+          "points": 45
+        }
+      ],
+      "error_code": null,
+      "resources": [
+        {
+          "type": "AWS::IAM::User",
+          "identifier": "support-backup"
+        }
+      ],
+      "remediation": [
+        {
+          "step": "Check the new user's keys and permissions",
+          "command": "aws iam list-access-keys --user-name support-backup"
+        },
+        {
+          "step": "List its attached policies",
+          "command": "aws iam list-attached-user-policies --user-name support-backup"
+        },
+        {
+          "step": "If the actor's access was not expected, deactivate the key it used",
+          "command": "aws iam update-access-key --user-name build-agent --access-key-id AKIASYNTHETIC0001 --status Inactive"
+        }
+      ],
+      "duplicate_deliveries": 0,
+      "conflicting_copy": true
+    },
+    {
+      "time": "2026-10-27T09:03:20Z",
+      "event_id": "7c61a1e2-886b-5064-9d39-34fc4e7bd897",
+      "event_name": "CreateAccessKey",
+      "event_source": "iam.amazonaws.com",
+      "actor": "build-agent",
+      "actor_key": "arn:aws:iam::123456789012:user/build-agent",
+      "source_ip": "198.51.100.23",
+      "read_only": false,
+      "kind": "detection",
+      "category": "identity_creation",
+      "tactic": "persistence",
+      "severity": "HIGH",
+      "severity_score": 65,
+      "score_factors": [
+        {
+          "factor": "base score for identity_creation (CreateAccessKey)",
+          "points": 55
+        },
+        {
+          "factor": "credential created for a different user (support-backup)",
+          "points": 10
+        }
+      ],
+      "error_code": null,
+      "resources": [
+        {
+          "type": "AWS::IAM::User",
+          "identifier": "support-backup"
+        }
+      ],
+      "remediation": [
+        {
+          "step": "Deactivate the new access key (keep it for evidence)",
+          "command": "aws iam update-access-key --user-name support-backup --access-key-id AKIASYNTHETIC0002 --status Inactive"
+        },
+        {
+          "step": "If the actor's access was not expected, deactivate the key it used",
+          "command": "aws iam update-access-key --user-name build-agent --access-key-id AKIASYNTHETIC0001 --status Inactive"
+        }
+      ],
+      "duplicate_deliveries": 1,
+      "conflicting_copy": false
+    },
+    {
+      "time": "2026-10-27T09:04:00Z",
+      "event_id": "5d9f979c-fe5f-5366-84b3-34a14a90bf7b",
+      "event_name": "AttachUserPolicy",
+      "event_source": "iam.amazonaws.com",
+      "actor": "build-agent",
+      "actor_key": "arn:aws:iam::123456789012:user/build-agent",
+      "source_ip": "198.51.100.23",
+      "read_only": false,
+      "kind": "detection",
+      "category": "iam_policy_change",
+      "tactic": "privilege_escalation",
+      "severity": "CRITICAL",
+      "severity_score": 85,
+      "score_factors": [
+        {
+          "factor": "base score for iam_policy_change (AttachUserPolicy)",
+          "points": 65
+        },
+        {
+          "factor": "grants administrator access (AdministratorAccess or Allow *:*)",
+          "points": 20
+        }
+      ],
+      "error_code": null,
+      "resources": [
+        {
+          "type": "AWS::IAM::User",
+          "identifier": "support-backup"
+        },
+        {
+          "type": "AWS::IAM::Policy",
+          "identifier": "arn:aws:iam::aws:policy/AdministratorAccess"
+        }
+      ],
+      "remediation": [
+        {
+          "step": "Remove the permission if it was not authorised",
+          "command": "aws iam detach-user-policy --user-name support-backup --policy-arn arn:aws:iam::aws:policy/AdministratorAccess"
+        },
+        {
+          "step": "If the actor's access was not expected, deactivate the key it used",
+          "command": "aws iam update-access-key --user-name build-agent --access-key-id AKIASYNTHETIC0001 --status Inactive"
+        }
+      ],
+      "duplicate_deliveries": 0,
+      "conflicting_copy": false
+    },
+    {
+      "time": "2026-10-27T09:04:30Z",
+      "event_id": "c5c096fd-698c-5a49-ba5c-ff918ea81092",
+      "event_name": "PutRolePolicy",
+      "event_source": "iam.amazonaws.com",
+      "actor": "build-agent",
+      "actor_key": "arn:aws:iam::123456789012:user/build-agent",
+      "source_ip": "198.51.100.23",
+      "read_only": false,
+      "kind": "detection",
+      "category": "iam_policy_change",
+      "tactic": "privilege_escalation",
+      "severity": "HIGH",
+      "severity_score": 60,
+      "score_factors": [
+        {
+          "factor": "base score for iam_policy_change (PutRolePolicy)",
+          "points": 65
+        },
+        {
+          "factor": "grants administrator access (AdministratorAccess or Allow *:*)",
+          "points": 20
+        },
+        {
+          "factor": "call failed (AccessDenied): an attempt, not a change",
+          "points": -25
+        }
+      ],
+      "error_code": "AccessDenied",
+      "resources": [
+        {
+          "type": "AWS::IAM::Role",
+          "identifier": "prod-deploy-role"
+        },
+        {
+          "type": "AWS::IAM::Policy",
+          "identifier": "maintenance"
+        }
+      ],
+      "remediation": [
+        {
+          "step": "The call failed, so nothing changed. Investigate why the principal attempted it.",
+          "command": "aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=build-agent"
+        }
+      ],
+      "duplicate_deliveries": 0,
+      "conflicting_copy": false
+    },
+    {
+      "time": "2026-10-27T09:06:00Z",
+      "event_id": "c12b17b8-22a0-5733-bc54-9fb293595d81",
+      "event_name": "UpdateAssumeRolePolicy",
+      "event_source": "iam.amazonaws.com",
+      "actor": "build-agent",
+      "actor_key": "arn:aws:iam::123456789012:user/build-agent",
+      "source_ip": "198.51.100.23",
+      "read_only": false,
+      "kind": "detection",
+      "category": "role_trust_change",
+      "tactic": "privilege_escalation",
+      "severity": "CRITICAL",
+      "severity_score": 90,
+      "score_factors": [
+        {
+          "factor": "base score for role_trust_change (UpdateAssumeRolePolicy)",
+          "points": 70
+        },
+        {
+          "factor": "trust policy now trusts another AWS account: 111122223333",
+          "points": 20
+        }
+      ],
+      "error_code": null,
+      "resources": [
+        {
+          "type": "AWS::IAM::Role",
+          "identifier": "prod-deploy-role"
+        }
+      ],
+      "remediation": [
+        {
+          "step": "Inspect the current trust policy",
+          "command": "aws iam get-role --role-name prod-deploy-role --query Role.AssumeRolePolicyDocument"
+        },
+        {
+          "step": "Restore the trust policy from source control",
+          "command": "aws iam update-assume-role-policy --role-name prod-deploy-role --policy-document file://known-good-trust.json"
+        },
+        {
+          "step": "Revoke active sessions: IAM > Roles > prod-deploy-role > Revoke sessions",
+          "command": null
+        },
+        {
+          "step": "If the actor's access was not expected, deactivate the key it used",
+          "command": "aws iam update-access-key --user-name build-agent --access-key-id AKIASYNTHETIC0001 --status Inactive"
+        }
+      ],
+      "duplicate_deliveries": 0,
+      "conflicting_copy": false
+    },
+    {
+      "time": "2026-10-27T09:07:30Z",
+      "event_id": "c839a22d-0ffe-5bd0-a82a-e5654ec9821e",
+      "event_name": "DeactivateMFADevice",
+      "event_source": "iam.amazonaws.com",
+      "actor": "build-agent",
+      "actor_key": "arn:aws:iam::123456789012:user/build-agent",
+      "source_ip": "198.51.100.23",
+      "read_only": false,
+      "kind": "detection",
+      "category": "mfa_tampering",
+      "tactic": "defense_evasion",
+      "severity": "HIGH",
+      "severity_score": 75,
+      "score_factors": [
+        {
+          "factor": "base score for mfa_tampering (DeactivateMFADevice)",
+          "points": 75
+        }
+      ],
+      "error_code": null,
+      "resources": [
+        {
+          "type": "AWS::IAM::User",
+          "identifier": "admin-ops"
+        }
+      ],
+      "remediation": [
+        {
+          "step": "List the user's remaining MFA devices",
+          "command": "aws iam list-mfa-devices --user-name admin-ops"
+        },
+        {
+          "step": "Re-enrol MFA for admin-ops in the console: IAM > Users > admin-ops > Security credentials",
+          "command": null
+        },
+        {
+          "step": "If the actor's access was not expected, deactivate the key it used",
+          "command": "aws iam update-access-key --user-name build-agent --access-key-id AKIASYNTHETIC0001 --status Inactive"
+        }
+      ],
+      "duplicate_deliveries": 0,
+      "conflicting_copy": false
+    },
+    {
+      "time": "2026-10-27T09:08:15Z",
+      "event_id": "d40230b7-9a9b-56bb-a56e-755229969b8d",
+      "event_name": "AuthorizeSecurityGroupIngress",
+      "event_source": "ec2.amazonaws.com",
+      "actor": "build-agent",
+      "actor_key": "arn:aws:iam::123456789012:user/build-agent",
+      "source_ip": "198.51.100.23",
+      "read_only": false,
+      "kind": "detection",
+      "category": "network_exposure",
+      "tactic": "initial_access",
+      "severity": "HIGH",
+      "severity_score": 80,
+      "score_factors": [
+        {
+          "factor": "base score for network_exposure (AuthorizeSecurityGroupIngress)",
+          "points": 50
+        },
+        {
+          "factor": "opens ingress to the whole internet (0.0.0.0/0)",
+          "points": 20
+        },
+        {
+          "factor": "exposes admin or database ports: SSH (22)",
+          "points": 10
+        }
+      ],
+      "error_code": null,
+      "resources": [],
+      "remediation": [
+        {
+          "step": "Revoke the internet-facing rule on sg-0a1b2c3d4e5f60718",
+          "command": "aws ec2 revoke-security-group-ingress --group-id sg-0a1b2c3d4e5f60718 --protocol tcp --port 22 --cidr 0.0.0.0/0"
+        },
+        {
+          "step": "If the actor's access was not expected, deactivate the key it used",
+          "command": "aws iam update-access-key --user-name build-agent --access-key-id AKIASYNTHETIC0001 --status Inactive"
+        }
+      ],
+      "duplicate_deliveries": 0,
+      "conflicting_copy": false
+    },
+    {
+      "time": "2026-10-27T09:10:00Z",
+      "event_id": "7e3e1525-dca4-56ee-95ed-2fb443a25a5d",
+      "event_name": "StopLogging",
+      "event_source": "cloudtrail.amazonaws.com",
+      "actor": "build-agent",
+      "actor_key": "arn:aws:iam::123456789012:user/build-agent",
+      "source_ip": "198.51.100.23",
+      "read_only": false,
+      "kind": "detection",
+      "category": "logging_tamper",
+      "tactic": "defense_evasion",
+      "severity": "CRITICAL",
+      "severity_score": 90,
+      "score_factors": [
+        {
+          "factor": "base score for logging_tamper (StopLogging)",
+          "points": 90
+        }
+      ],
+      "error_code": null,
+      "resources": [
+        {
+          "type": "AWS::CloudTrail::Trail",
+          "identifier": "arn:aws:cloudtrail:us-east-1:123456789012:trail/aws-sec-ir-trail"
+        },
+        {
+          "type": "AWS::CloudTrail::Trail",
+          "identifier": "arn:aws:cloudtrail:us-east-1:123456789012:trail/aws-sec-ir-trail"
+        }
+      ],
+      "remediation": [
+        {
+          "step": "Restart logging",
+          "command": "aws cloudtrail start-logging --name aws-sec-ir-trail"
+        },
+        {
+          "step": "Confirm the trail is logging",
+          "command": "aws cloudtrail get-trail-status --name aws-sec-ir-trail"
+        },
+        {
+          "step": "Compare event selectors with the baseline",
+          "command": "aws cloudtrail get-event-selectors --trail-name aws-sec-ir-trail"
+        },
+        {
+          "step": "If the actor's access was not expected, deactivate the key it used",
+          "command": "aws iam update-access-key --user-name build-agent --access-key-id AKIASYNTHETIC0001 --status Inactive"
+        }
+      ],
+      "duplicate_deliveries": 2,
+      "conflicting_copy": false
+    },
+    {
+      "time": "2026-10-27T09:41:00Z",
+      "event_id": "f1276ad4-f37f-5301-948c-5934bc736519",
+      "event_name": "StartLogging",
+      "event_source": "cloudtrail.amazonaws.com",
+      "actor": "security-oncall",
+      "actor_key": "arn:aws:iam::123456789012:user/security-oncall",
+      "source_ip": "192.0.2.44",
+      "read_only": false,
+      "kind": "unclassified_change",
+      "category": null,
+      "tactic": null,
+      "severity": null,
+      "severity_score": null,
+      "score_factors": [],
+      "error_code": null,
+      "resources": [
+        {
+          "type": "AWS::CloudTrail::Trail",
+          "identifier": "arn:aws:cloudtrail:us-east-1:123456789012:trail/aws-sec-ir-trail"
+        },
+        {
+          "type": "AWS::CloudTrail::Trail",
+          "identifier": "arn:aws:cloudtrail:us-east-1:123456789012:trail/aws-sec-ir-trail"
+        }
+      ],
+      "remediation": [],
+      "duplicate_deliveries": 0,
+      "conflicting_copy": false
+    },
+    {
+      "time": "2026-10-27T09:43:00Z",
+      "event_id": "535762ef-6d3d-508e-a164-25075a7abad8",
+      "event_name": "ScheduleKeyDeletion",
+      "event_source": "kms.amazonaws.com",
+      "actor": "build-agent",
+      "actor_key": "arn:aws:iam::123456789012:user/build-agent",
+      "source_ip": "198.51.100.23",
+      "read_only": false,
+      "kind": "detection",
+      "category": "kms_key_destruction",
+      "tactic": "impact",
+      "severity": "CRITICAL",
+      "severity_score": 90,
+      "score_factors": [
+        {
+          "factor": "base score for kms_key_destruction (ScheduleKeyDeletion)",
+          "points": 85
+        },
+        {
+          "factor": "shortest possible deletion window (7 days)",
+          "points": 5
+        }
+      ],
+      "error_code": null,
+      "resources": [
+        {
+          "type": "AWS::KMS::Key",
+          "identifier": "arn:aws:kms:us-east-1:123456789012:key/1a2b3c4d-1111-4a4a-8b8b-0c0c0c0c0c01"
+        }
+      ],
+      "remediation": [
+        {
+          "step": "Cancel the deletion now",
+          "command": "aws kms cancel-key-deletion --key-id arn:aws:kms:us-east-1:123456789012:key/1a2b3c4d-1111-4a4a-8b8b-0c0c0c0c0c01"
+        },
+        {
+          "step": "Re-enable the key (a cancelled or disabled key stays Disabled)",
+          "command": "aws kms enable-key --key-id arn:aws:kms:us-east-1:123456789012:key/1a2b3c4d-1111-4a4a-8b8b-0c0c0c0c0c01"
+        },
+        {
+          "step": "If the actor's access was not expected, deactivate the key it used",
+          "command": "aws iam update-access-key --user-name build-agent --access-key-id AKIASYNTHETIC0001 --status Inactive"
+        }
+      ],
+      "duplicate_deliveries": 0,
+      "conflicting_copy": false
+    },
+    {
+      "time": "2026-10-27T09:45:30Z",
+      "event_id": "be543da2-cd08-5491-a079-faa812f7be2e",
+      "event_name": "ListBuckets",
+      "event_source": "s3.amazonaws.com",
+      "actor": "reporting-user",
+      "actor_key": "arn:aws:iam::123456789012:user/reporting-user",
+      "source_ip": "203.0.113.10",
+      "read_only": true,
+      "kind": "context",
+      "category": null,
+      "tactic": null,
+      "severity": null,
+      "severity_score": null,
+      "score_factors": [],
+      "error_code": null,
+      "resources": [],
+      "remediation": [],
+      "duplicate_deliveries": 0,
+      "conflicting_copy": false
+    },
+    {
+      "time": "2026-10-27T14:00:00Z",
+      "event_id": "a6a96fe4-ac93-5d9c-86e4-b6dcdded9dcf",
+      "event_name": "DisableKey",
+      "event_source": "kms.amazonaws.com",
+      "actor": "root",
+      "actor_key": "arn:aws:iam::123456789012:root",
+      "source_ip": "203.0.113.77",
+      "read_only": false,
+      "kind": "detection",
+      "category": "kms_key_destruction",
+      "tactic": "impact",
+      "severity": "CRITICAL",
+      "severity_score": 95,
+      "score_factors": [
+        {
+          "factor": "base score for kms_key_destruction (DisableKey)",
+          "points": 75
+        },
+        {
+          "factor": "actor is the root user",
+          "points": 20
+        }
+      ],
+      "error_code": null,
+      "resources": [
+        {
+          "type": "AWS::KMS::Key",
+          "identifier": "arn:aws:kms:us-east-1:123456789012:key/1a2b3c4d-2222-4a4a-8b8b-0c0c0c0c0c02"
+        }
+      ],
+      "remediation": [
+        {
+          "step": "Re-enable the key (a cancelled or disabled key stays Disabled)",
+          "command": "aws kms enable-key --key-id arn:aws:kms:us-east-1:123456789012:key/1a2b3c4d-2222-4a4a-8b8b-0c0c0c0c0c02"
+        },
+        {
+          "step": "Root was used: rotate the root password, confirm root MFA, and delete any root access keys",
+          "command": null
+        }
+      ],
+      "duplicate_deliveries": 0,
+      "conflicting_copy": false
+    }
+  ],
+  "rejected": [
+    {
+      "index": 2,
+      "eventID": null,
+      "eventName": "DeleteTrail",
+      "reason": "missing eventID"
+    },
+    {
+      "index": 6,
+      "eventID": "5a075e09-1005-5311-82db-761ee2222a42",
+      "eventName": "CreateAccessKey",
+      "reason": "unparseable eventTime 'yesterday'"
+    },
+    {
+      "index": 7,
+      "eventID": "feb276df-8e53-518c-851c-252d78fe0a8b",
+      "eventName": "PutBucketPolicy",
+      "reason": "missing eventTime"
+    }
+  ],
+  "conflicts": [
+    {
+      "eventID": "8c803f89-0760-587f-974e-54a4c58da286",
+      "eventName": "CreateUser",
+      "reason": "same eventID with different content; first copy kept, verify against CloudTrail Event history"
+    }
+  ]
+}
