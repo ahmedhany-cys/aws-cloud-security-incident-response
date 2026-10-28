@@ -1,0 +1,10 @@
+# $ aws events list-targets-by-rule --rule aws-sec-ir-identity-creation
+# 2026-10-28T06:23:20Z
+{
+    "Targets": [
+        {
+            "Id": "incident-processor",
+            "Arn": "arn:aws:lambda:us-east-1:123456789012:function:aws-sec-ir-incident-processor"
+        }
+    ]
+}

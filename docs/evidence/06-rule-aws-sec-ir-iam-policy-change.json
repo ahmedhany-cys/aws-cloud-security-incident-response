@@ -1,5 +1,5 @@
 # $ aws events describe-rule --name aws-sec-ir-iam-policy-change
-# 2026-10-26T07:09:30Z
+# 2026-10-28T06:23:17Z
 {
     "Name": "aws-sec-ir-iam-policy-change",
     "Arn": "arn:aws:events:us-east-1:123456789012:rule/aws-sec-ir-iam-policy-change",

@@ -1,5 +1,5 @@
 # $ aws scheduler get-schedule --group-name aws-sec-ir --name aws-sec-ir-trail-health-check
-# 2026-10-26T07:10:03Z
+# 2026-10-28T06:23:55Z
 {
     "ActionAfterCompletion": "NONE",
     "Arn": "arn:aws:scheduler:us-east-1:123456789012:schedule/aws-sec-ir/aws-sec-ir-trail-health-check",

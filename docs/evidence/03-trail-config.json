@@ -1,5 +1,5 @@
 # $ aws cloudtrail get-trail --name aws-sec-ir-trail
-# 2026-10-26T07:09:25Z
+# 2026-10-28T06:23:14Z
 {
     "Trail": {
         "Name": "aws-sec-ir-trail",

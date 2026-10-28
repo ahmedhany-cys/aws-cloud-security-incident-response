@@ -13,8 +13,15 @@ KEYID_RE='(AKIA|ASIA)[0-9A-Z]{12,}'
 PRINCIPAL_RE='(AIDA|AROA)[0-9A-Z]{12,}'
 IPV4_RE='(^|[^0-9.])([0-9]{1,3}\.){3}[0-9]{1,3}([^0-9.]|$)'
 
+# Local paths reveal the operator's home directory. The project root becomes
+# <project-root>; any other macOS/Linux home directory becomes <home>.
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT_RE="$(printf '%s' "$PROJECT_ROOT" | sed -E 's/[][\\.^$*+?(){}|/]/\\&/g')"
+HOME_RE='/(Users|home)/[^/[:space:]]+'
+
 redact() {
-  sed -E -e "s/${ACCOUNT_RE}/123456789012/g" -e "s/${EMAIL_RE}/redacted@example.com/g" \
+  sed -E -e "s/${ROOT_RE}/<project-root>/g" -e "s#${HOME_RE}#<home>#g" \
+        -e "s/${ACCOUNT_RE}/123456789012/g" -e "s/${EMAIL_RE}/redacted@example.com/g" \
         -e "s/${IPV4_RE}/\1203.0.113.10\3/g" \
         -e "s/${KEYID_RE}/AKIA_REDACTED/g" -e "s/${PRINCIPAL_RE}/AIDA_REDACTED/g"
 }

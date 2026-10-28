@@ -1,5 +1,5 @@
 # $ aws events describe-rule --name aws-sec-ir-s3-permission-change
-# 2026-10-26T07:09:35Z
+# 2026-10-28T06:23:30Z
 {
     "Name": "aws-sec-ir-s3-permission-change",
     "Arn": "arn:aws:events:us-east-1:123456789012:rule/aws-sec-ir-s3-permission-change",

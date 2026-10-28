@@ -1,0 +1,62 @@
+# $ aws s3 cp s3://aws-sec-ir-incident-reports-ahr4827/incidents/2026/10/28/e00d5dfb-a42c-4b97-ab2e-e67a77dcb72a.json -
+# 2026-10-28T06:22:52Z
+{
+  "actor": {
+    "arn": "arn:aws:iam::123456789012:user/aws-sec-ir-deployer",
+    "type": "IAMUser",
+    "user_name": "aws-sec-ir-deployer"
+  },
+  "aws_region": "us-east-1",
+  "category": "iam_policy_change",
+  "detected_at": "2026-10-28T06:22:37Z",
+  "detection_source": "eventbridge",
+  "error_code": null,
+  "error_message": null,
+  "event_name": "AttachUserPolicy",
+  "event_source": "iam.amazonaws.com",
+  "event_time": "2026-10-28T06:22:34Z",
+  "incident_id": "inc-e00d5dfb-a42c-4b97-ab2e-e67a77dcb72a",
+  "raw_event_id": "e00d5dfb-a42c-4b97-ab2e-e67a77dcb72a",
+  "recommended_actions": [
+    "Confirm the change was authorised (ticket / change record).",
+    "Review the policy document for wildcard (*) actions or resources.",
+    "If unauthorised: detach/delete the policy, then rotate the actor's credentials.",
+    "Check CloudTrail for other activity by the same principal in the last 24 h."
+  ],
+  "remediation": [
+    {
+      "command": "aws iam detach-user-policy --user-name aws-sec-ir-test-user --policy-arn arn:aws:iam::123456789012:policy/aws-sec-ir/aws-sec-ir-test-policy",
+      "step": "Remove the permission if it was not authorised"
+    },
+    {
+      "command": "aws iam update-access-key --user-name aws-sec-ir-deployer --access-key-id AKIA_REDACTED --status Inactive",
+      "step": "If the actor's access was not expected, deactivate the key it used"
+    }
+  ],
+  "request_parameters": {
+    "policyArn": "arn:aws:iam::123456789012:policy/aws-sec-ir/aws-sec-ir-test-policy",
+    "userName": "aws-sec-ir-test-user"
+  },
+  "resources": [
+    {
+      "identifier": "aws-sec-ir-test-user",
+      "type": "AWS::IAM::User"
+    },
+    {
+      "identifier": "arn:aws:iam::123456789012:policy/aws-sec-ir/aws-sec-ir-test-policy",
+      "type": "AWS::IAM::Policy"
+    }
+  ],
+  "schema_version": "1.1",
+  "score_factors": [
+    {
+      "factor": "base score for iam_policy_change (AttachUserPolicy)",
+      "points": 65
+    }
+  ],
+  "severity": "HIGH",
+  "severity_score": 65,
+  "source_ip": "203.0.113.10",
+  "tactic": "privilege_escalation",
+  "user_agent": "aws-cli/2.36.40 md/awscrt#0.36.2 ua/2.1 os/macos#24.6.0 md/arch#arm64 lang/python#3.14.7 md/pyimpl#CPython m/Z,AN,E,n,b cfg/retry-mode#standard md/installer#source sid/22ad1e0590a4 md/prompt#off md/command#iam.attach-user-policy"
+}

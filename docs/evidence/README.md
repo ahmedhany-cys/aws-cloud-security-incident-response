@@ -12,6 +12,9 @@ Layout:
 - `run1/`: the first run (T1 to T5). Includes the failed T5 and its diagnosis. Its incident reports still contain the since-removed `eventbridge_rule: null` field.
 - `run2-T3/`: the failed second T3 attempt and its diagnosis.
 - `T7-*` (top level): the passing T7 run (run 5) of the scheduled trail health check. `00c-terraform-apply-health-check.txt` is its deploy.
+- `scoring-smoke/`: T1 repeated on 2026-10-28 after deploying the scoring code; the report has `severity_score`, `score_factors`, `tactic` and `remediation`.
+- `simulation/`: the incident timeline built from the synthetic CloudTrail scenario (no AWS data).
+- `00d-terraform-apply-new-types.txt`: deploy of the five new detection rules.
 - `run4-T7-scriptbug/`: the first T7 run, where the health check worked but the script's run counter failed; `NOTE.txt` explains.
 
 Naming: `Tn-command.txt` (the trigger), `Tn-restore.txt` / `Tn-verify-restored.txt`

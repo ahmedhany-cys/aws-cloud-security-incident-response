@@ -1,17 +1,17 @@
 # $ aws lambda get-function-configuration --function-name aws-sec-ir-incident-processor
-# 2026-10-26T07:09:38Z
+# 2026-10-28T06:23:32Z
 {
     "FunctionName": "aws-sec-ir-incident-processor",
     "FunctionArn": "arn:aws:lambda:us-east-1:123456789012:function:aws-sec-ir-incident-processor",
     "Runtime": "python3.12",
     "Role": "arn:aws:iam::123456789012:role/aws-sec-ir-incident-processor-role",
     "Handler": "incident_processor.handler",
-    "CodeSize": 5650,
+    "CodeSize": 11495,
     "Description": "Turns suspicious CloudTrail API events into JSON incident reports in S3",
     "Timeout": 30,
     "MemorySize": 128,
-    "LastModified": "2026-10-26T06:57:18.000+0000",
-    "CodeSha256": "3XR3eYrNsZB+opzID++qMoIqBhacxvYJGt/nJU4uwFk=",
+    "LastModified": "2026-10-28T06:21:32.000+0000",
+    "CodeSha256": "qFNW2tPosKeNS+0+m/OxhX2F+VNz3poipLcGLXCInoI=",
     "Version": "$LATEST",
     "Environment": {
         "Variables": {
@@ -23,7 +23,7 @@
     "TracingConfig": {
         "Mode": "PassThrough"
     },
-    "RevisionId": "11d1470b-e875-4837-bf26-ebdfb5b782e6",
+    "RevisionId": "0007b479-1981-4032-99e3-b130f98c8575",
     "State": "Active",
     "LastUpdateStatus": "Successful",
     "PackageType": "Zip",
@@ -38,7 +38,7 @@
         "OptimizationStatus": "Off"
     },
     "RuntimeVersionConfig": {
-        "RuntimeVersionArn": "arn:aws:lambda:us-east-1::runtime:0fec05b8b43b0ecfbabe4fd585b35e423f123456789012f8a10b0e8739c36c07"
+        "RuntimeVersionArn": "arn:aws:lambda:us-east-1::runtime:3bb053083392d837807c86b2bb927e6c93bdbb5e7026b6adcf56119ccea9a4d8"
     },
     "LoggingConfig": {
         "LogFormat": "Text",

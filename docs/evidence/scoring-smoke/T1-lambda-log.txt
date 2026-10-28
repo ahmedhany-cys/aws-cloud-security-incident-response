@@ -1,0 +1,4 @@
+# $ lambda_logs e00d5dfb-a42c-4b97-ab2e-e67a77dcb72a 1793168552
+# 2026-10-28T06:22:53Z
+{"level": "INFO", "logger": "incident_processor", "message": "incident_written", "request_id": "2bbe10f3-5a74-4401-8c40-830ba0d30134", "incident_id": "inc-e00d5dfb-a42c-4b97-ab2e-e67a77dcb72a", "event_name": "AttachUserPolicy", "severity": "HIGH", "severity_score": 65, "category": "iam_policy_change", "actor": "arn:aws:iam::123456789012:user/aws-sec-ir-deployer", "s3_key": "incidents/2026/10/28/e00d5dfb-a42c-4b97-ab2e-e67a77dcb72a.json", "raw_event_id": "e00d5dfb-a42c-4b97-ab2e-e67a77dcb72a"}
+

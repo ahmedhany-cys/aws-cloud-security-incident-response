@@ -1,0 +1,11 @@
+# $ aws events describe-rule --name aws-sec-ir-network-exposure
+# 2026-10-28T06:23:26Z
+{
+    "Name": "aws-sec-ir-network-exposure",
+    "Arn": "arn:aws:events:us-east-1:123456789012:rule/aws-sec-ir-network-exposure",
+    "EventPattern": "{\"detail\":{\"eventName\":[\"AuthorizeSecurityGroupIngress\"],\"eventSource\":[\"ec2.amazonaws.com\"]},\"detail-type\":[\"AWS API Call via CloudTrail\"],\"source\":[\"aws.ec2\"]}",
+    "State": "ENABLED",
+    "Description": "Security group ingress rule added (possible internet exposure)",
+    "EventBusName": "default",
+    "CreatedBy": "123456789012"
+}
