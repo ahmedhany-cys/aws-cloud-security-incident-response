@@ -69,7 +69,7 @@ def wire(monkeypatch):
 # =============================================================================
 
 def test_failed_notification_keeps_the_incident_and_fails_loudly(wire, capsys):
-    s3, sns = wire(sns=FakeSNS(failures=1))
+    s3, _ = wire(sns=FakeSNS(failures=1))
     with pytest.raises(ip.NotificationError) as exc:
         ip.handler(load("stop_logging.json"), None)
     assert len(s3.calls) == 1, "the report must be stored before the alert is attempted"
@@ -93,14 +93,14 @@ def test_retry_after_failed_notification_is_idempotent(wire):
 
 
 def test_storage_failure_never_sends_an_alert(wire):
-    s3, sns = wire(s3=FakeS3(fail=True))
+    _, sns = wire(s3=FakeS3(fail=True))
     with pytest.raises(RuntimeError, match="S3 outage"):
         ip.handler(load("stop_logging.json"), None)
     assert sns.calls == [], "never alert about an incident that was not stored"
 
 
 def test_health_check_failed_notification(wire):
-    s3, sns = wire(sns=FakeSNS(failures=1))
+    s3, _ = wire(sns=FakeSNS(failures=1))
     with pytest.raises(ip.NotificationError):
         ip.health_check_handler({}, None)
     assert len(s3.calls) == 1
